@@ -2,5 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/BLT" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/BLT/libraries/parallel-hashmap" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/openal-soft" vcs="Git" />
   </component>
 </project>
