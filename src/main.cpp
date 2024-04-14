@@ -56,7 +56,7 @@ void update(std::int32_t width, std::int32_t height)
     
     renderer_2d.drawLine(blt::vec4{1, 0, 1, 1}, 0.0f, blt::vec2{x,y}, blt::vec2{500, 500}, 5.0f);
     renderer_2d.drawLine(blt::vec4{1, 0, 0, 1}, 0.0f, blt::vec2{0,150}, blt::vec2{240, 0}, 12.0f);
-    renderer_2d.drawPoint(blt::vec4{0, 1, 0, 1}, -0.4f, blt::vec2{500, 500}, 50.0f);
+    renderer_2d.drawPoint(blt::vec4{0, 1, 0, 1}, 1.0f, blt::vec2{500, 500}, 50.0f);
     
     camera.update();
     camera.update_view(global_matrices);
@@ -67,7 +67,7 @@ void update(std::int32_t width, std::int32_t height)
 
 int main(int argc, const char** argv)
 {
-    blt::gfx::init(blt::gfx::window_data{"My Sexy Window", init, update}.setSyncInterval(1));
+    blt::gfx::init(blt::gfx::window_data{"My Sexy Window", init, update, 1440, 720}.setSyncInterval(1));
     global_matrices.cleanup();
     resources.cleanup();
     renderer_2d.cleanup();
