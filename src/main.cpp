@@ -26,7 +26,7 @@ blt::gfx::resource_manager resources;
 blt::gfx::batch_renderer_2d renderer_2d(resources);
 blt::gfx::first_person_camera camera;
 
-void init()
+void init(blt::gfx::window_context& context)
 {
     using namespace blt::gfx;
     
@@ -40,7 +40,7 @@ float x = 50, y = 50;
 float sx = 0.5, sy = 0.5;
 float ax = 0.05, ay = 0.05;
 
-void update(std::int32_t width, std::int32_t height)
+void update(blt::gfx::window_context& context, std::int32_t width, std::int32_t height)
 {
     global_matrices.update_perspectives(width, height, 90, 0.1, 2000);
     
@@ -59,6 +59,7 @@ void update(std::int32_t width, std::int32_t height)
     renderer_2d.drawLine(blt::vec4{1, 0, 0, 1}, 0.0f, blt::vec2{0,150}, blt::vec2{240, 0}, 12.0f);
     renderer_2d.drawPoint(blt::vec4{0, 1, 0, 1}, 1.0f, blt::vec2{500, 500}, 50.0f);
     renderer_2d.drawPoint(blt::vec4{0, 1, 1, 1}, 1.0f, blt::vec2{800, 500}, 256.0f);
+    //renderer_2d.drawRectangle(blt::vec4{1,1,1,1}, -1.0f, blt::vec2{width / 2.0, height / 2.0}, blt::vec2{width, height});
     
     camera.update();
     camera.update_view(global_matrices);
