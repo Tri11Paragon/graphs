@@ -33,7 +33,6 @@ void init(blt::gfx::window_context& context)
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
-    
 }
 
 float x = 50, y = 50;
