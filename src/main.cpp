@@ -19,28 +19,34 @@
 #include "blt/gfx/renderer/resource_manager.h"
 #include "blt/gfx/renderer/batch_2d_renderer.h"
 #include "blt/gfx/renderer/camera.h"
+#include <blt/gfx/framebuffer.h>
 #include <imgui.h>
 
 blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
 blt::gfx::batch_renderer_2d renderer_2d(resources);
 blt::gfx::first_person_camera camera;
+blt::gfx::fbo_t render_texture;
 
-void init(blt::gfx::window_context& context)
+void init(const blt::gfx::window_context& context)
 {
     using namespace blt::gfx;
     
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
+    
+    render_texture = fbo_t::make_render_texture(1440, 720);
 }
 
 float x = 50, y = 50;
 float sx = 0.5, sy = 0.5;
 float ax = 0.05, ay = 0.05;
 
-void update(blt::gfx::window_context& context, std::int32_t width, std::int32_t height)
+void update(const blt::gfx::window_context& context, std::int32_t width, std::int32_t height)
 {
+    render_texture.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     global_matrices.update_perspectives(width, height, 90, 0.1, 2000);
     
     x += sx;
@@ -65,6 +71,7 @@ void update(blt::gfx::window_context& context, std::int32_t width, std::int32_t 
     global_matrices.update();
     
     renderer_2d.render();
+    blt::gfx::fbo_t::unbind();
 }
 
 int main(int argc, const char** argv)
