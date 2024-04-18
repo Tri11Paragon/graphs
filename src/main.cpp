@@ -32,6 +32,9 @@ void init(const blt::gfx::window_context& context)
 {
     using namespace blt::gfx;
     
+    resources.enqueue("../res/debian.png", "debian");
+    resources.enqueue("../res/john256.png", "john");
+    
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
@@ -45,8 +48,8 @@ float ax = 0.05, ay = 0.05;
 
 void update(const blt::gfx::window_context& context, std::int32_t width, std::int32_t height)
 {
-    render_texture.bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //render_texture.bind();
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     global_matrices.update_perspectives(width, height, 90, 0.1, 2000);
     
     x += sx;
@@ -63,7 +66,7 @@ void update(const blt::gfx::window_context& context, std::int32_t width, std::in
     renderer_2d.drawLine(blt::vec4{1, 0, 1, 1}, 0.0f, blt::vec2{x,y}, blt::vec2{500, 500}, 5.0f);
     renderer_2d.drawLine(blt::vec4{1, 0, 0, 1}, 0.0f, blt::vec2{0,150}, blt::vec2{240, 0}, 12.0f);
     renderer_2d.drawPoint(blt::vec4{0, 1, 0, 1}, 1.0f, blt::vec2{500, 500}, 50.0f);
-    renderer_2d.drawPoint(blt::vec4{0, 1, 1, 1}, 1.0f, blt::vec2{800, 500}, 256.0f);
+    renderer_2d.drawPoint("john", 1.0f, blt::vec2{800, 500}, 256.0f);
     //renderer_2d.drawRectangle(blt::vec4{1,1,1,1}, -1.0f, blt::vec2{width / 2.0, height / 2.0}, blt::vec2{width, height});
     
     camera.update();
@@ -71,7 +74,7 @@ void update(const blt::gfx::window_context& context, std::int32_t width, std::in
     global_matrices.update();
     
     renderer_2d.render();
-    blt::gfx::fbo_t::unbind();
+    //blt::gfx::fbo_t::unbind();
 }
 
 int main(int argc, const char** argv)

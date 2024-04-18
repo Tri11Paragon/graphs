@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerExplorerSettingsProvider">
+    <option name="enabled" value="false" />
+    <option name="connected" value="true" />
+    <option name="remoteCompilers">
+      <list>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;/usr/bin/cmake&quot;,&quot;name&quot;:&quot;/usr/bin/cmake&quot;,&quot;lang&quot;:&quot;cmakescript&quot;,&quot;compilerType&quot;:&quot;cmakescript&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="/usr/bin/cmake" />
+          <option name="name" value="/usr/bin/cmake" />
+          <option name="language" value="cmakescript" />
+          <option name="compilerType" value="cmakescript" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;/usr/bin/ruby&quot;,&quot;name&quot;:&quot;/usr/bin/ruby&quot;,&quot;lang&quot;:&quot;ruby&quot;,&quot;compilerType&quot;:&quot;ruby&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="/usr/bin/ruby" />
+          <option name="name" value="/usr/bin/ruby" />
+          <option name="language" value="ruby" />
+          <option name="compilerType" value="ruby" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;defaultgnuas&quot;,&quot;name&quot;:&quot;GNU AS (default)&quot;,&quot;lang&quot;:&quot;assembly&quot;,&quot;compilerType&quot;:&quot;assembly&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="defaultgnuas" />
+          <option name="name" value="GNU AS (default)" />
+          <option name="language" value="assembly" />
+          <option name="compilerType" value="assembly" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;hook010def&quot;,&quot;name&quot;:&quot;Hook 0.1.0&quot;,&quot;lang&quot;:&quot;hook&quot;,&quot;compilerType&quot;:&quot;hook&quot;,&quot;semver&quot;:&quot;0.1.0&quot;,&quot;instructionSet&quot;:&quot;hook&quot;}" />
+          <option name="id" value="hook010def" />
+          <option name="name" value="Hook 0.1.0" />
+          <option name="language" value="hook" />
+          <option name="version" value="0.1.0" />
+          <option name="compilerType" value="hook" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python310def&quot;,&quot;name&quot;:&quot;Python 3.10&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.10&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python310def" />
+          <option name="name" value="Python 3.10" />
+          <option name="language" value="python" />
+          <option name="version" value="3.10" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python311def&quot;,&quot;name&quot;:&quot;Python 3.11&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.11&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python311def" />
+          <option name="name" value="Python 3.11" />
+          <option name="language" value="python" />
+          <option name="version" value="3.11" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python35def&quot;,&quot;name&quot;:&quot;Python 3.5&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.5&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python35def" />
+          <option name="name" value="Python 3.5" />
+          <option name="language" value="python" />
+          <option name="version" value="3.5" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python36def&quot;,&quot;name&quot;:&quot;Python 3.6&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.6&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python36def" />
+          <option name="name" value="Python 3.6" />
+          <option name="language" value="python" />
+          <option name="version" value="3.6" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python37def&quot;,&quot;name&quot;:&quot;Python 3.7&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.7&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python37def" />
+          <option name="name" value="Python 3.7" />
+          <option name="language" value="python" />
+          <option name="version" value="3.7" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python38def&quot;,&quot;name&quot;:&quot;Python 3.8&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.8&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python38def" />
+          <option name="name" value="Python 3.8" />
+          <option name="language" value="python" />
+          <option name="version" value="3.8" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;python39def&quot;,&quot;name&quot;:&quot;Python 3.9&quot;,&quot;lang&quot;:&quot;python&quot;,&quot;compilerType&quot;:&quot;python&quot;,&quot;semver&quot;:&quot;3.9&quot;,&quot;instructionSet&quot;:&quot;python&quot;}" />
+          <option name="id" value="python39def" />
+          <option name="name" value="Python 3.9" />
+          <option name="language" value="python" />
+          <option name="version" value="3.9" />
+          <option name="compilerType" value="python" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;circledefault&quot;,&quot;name&quot;:&quot;circle default&quot;,&quot;lang&quot;:&quot;circle&quot;,&quot;compilerType&quot;:&quot;circle&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="circledefault" />
+          <option name="name" value="circle default" />
+          <option name="language" value="circle" />
+          <option name="compilerType" value="circle" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;clangdefault&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;c++&quot;,&quot;compilerType&quot;:&quot;clang&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="clangdefault" />
+          <option name="name" value="clang default" />
+          <option name="language" value="c++" />
+          <option name="compilerType" value="clang" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;cclangdefault&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;c&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="cclangdefault" />
+          <option name="name" value="clang default" />
+          <option name="language" value="c" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;cppforopenclclangdefault&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;cpp_for_opencl&quot;,&quot;compilerType&quot;:&quot;clang&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="cppforopenclclangdefault" />
+          <option name="name" value="clang default" />
+          <option name="language" value="cpp_for_opencl" />
+          <option name="compilerType" value="clang" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;irclang&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;llvm&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="irclang" />
+          <option name="name" value="clang default" />
+          <option name="language" value="llvm" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;openclcclangdefault&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;openclc&quot;,&quot;compilerType&quot;:&quot;clang&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="openclcclangdefault" />
+          <option name="name" value="clang default" />
+          <option name="language" value="openclc" />
+          <option name="compilerType" value="clang" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;spirvcppclangdefaultspir&quot;,&quot;name&quot;:&quot;clang default (SPIR-V asm, spir triple)&quot;,&quot;lang&quot;:&quot;cpp_for_opencl&quot;,&quot;compilerType&quot;:&quot;spirv&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="spirvcppclangdefaultspir" />
+          <option name="name" value="clang default (SPIR-V asm, spir triple)" />
+          <option name="language" value="cpp_for_opencl" />
+          <option name="compilerType" value="spirv" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;spirvclangdefaultspir&quot;,&quot;name&quot;:&quot;clang default (SPIR-V asm, spir triple)&quot;,&quot;lang&quot;:&quot;openclc&quot;,&quot;compilerType&quot;:&quot;spirv&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="spirvclangdefaultspir" />
+          <option name="name" value="clang default (SPIR-V asm, spir triple)" />
+          <option name="language" value="openclc" />
+          <option name="compilerType" value="spirv" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;spirvcppclangdefaultspir64&quot;,&quot;name&quot;:&quot;clang default (SPIR-V asm, spir64 triple)&quot;,&quot;lang&quot;:&quot;cpp_for_opencl&quot;,&quot;compilerType&quot;:&quot;spirv&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="spirvcppclangdefaultspir64" />
+          <option name="name" value="clang default (SPIR-V asm, spir64 triple)" />
+          <option name="language" value="cpp_for_opencl" />
+          <option name="compilerType" value="spirv" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;spirvclangdefaultspir64&quot;,&quot;name&quot;:&quot;clang default (SPIR-V asm, spir64 triple)&quot;,&quot;lang&quot;:&quot;openclc&quot;,&quot;compilerType&quot;:&quot;spirv&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="spirvclangdefaultspir64" />
+          <option name="name" value="clang default (SPIR-V asm, spir64 triple)" />
+          <option name="language" value="openclc" />
+          <option name="compilerType" value="spirv" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;cppfront_trunk&quot;,&quot;name&quot;:&quot;cppfront trunk&quot;,&quot;lang&quot;:&quot;cpp2_cppfront&quot;,&quot;compilerType&quot;:&quot;cppfront&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="cppfront_trunk" />
+          <option name="name" value="cppfront trunk" />
+          <option name="language" value="cpp2_cppfront" />
+          <option name="compilerType" value="cppfront" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;gdefault&quot;,&quot;name&quot;:&quot;g++ default&quot;,&quot;lang&quot;:&quot;c++&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="gdefault" />
+          <option name="name" value="g++ default" />
+          <option name="language" value="c++" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;objcxxgdefault&quot;,&quot;name&quot;:&quot;g++ default&quot;,&quot;lang&quot;:&quot;objc++&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="objcxxgdefault" />
+          <option name="name" value="g++ default" />
+          <option name="language" value="objc++" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;cg11&quot;,&quot;name&quot;:&quot;gcc 11.x&quot;,&quot;lang&quot;:&quot;c&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="cg11" />
+          <option name="name" value="gcc 11.x" />
+          <option name="language" value="c" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;objcg11&quot;,&quot;name&quot;:&quot;gcc 11.x&quot;,&quot;lang&quot;:&quot;objc&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="objcg11" />
+          <option name="name" value="gcc 11.x" />
+          <option name="language" value="objc" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;gimpleg11&quot;,&quot;name&quot;:&quot;gcc 11.x&quot;,&quot;lang&quot;:&quot;gimple&quot;,&quot;compilerType&quot;:&quot;gimple&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="gimpleg11" />
+          <option name="name" value="gcc 11.x" />
+          <option name="language" value="gimple" />
+          <option name="compilerType" value="gimple" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;cgdefault&quot;,&quot;name&quot;:&quot;gcc default&quot;,&quot;lang&quot;:&quot;c&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="cgdefault" />
+          <option name="name" value="gcc default" />
+          <option name="language" value="c" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;objcgdefault&quot;,&quot;name&quot;:&quot;gcc default&quot;,&quot;lang&quot;:&quot;objc&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="objcgdefault" />
+          <option name="name" value="gcc default" />
+          <option name="language" value="objc" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;gimplegdefault&quot;,&quot;name&quot;:&quot;gcc default&quot;,&quot;lang&quot;:&quot;gimple&quot;,&quot;compilerType&quot;:&quot;gimple&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="gimplegdefault" />
+          <option name="name" value="gcc default" />
+          <option name="language" value="gimple" />
+          <option name="compilerType" value="gimple" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;gfortran&quot;,&quot;name&quot;:&quot;gfortran&quot;,&quot;lang&quot;:&quot;fortran&quot;,&quot;compilerType&quot;:&quot;fortran&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="gfortran" />
+          <option name="name" value="gfortran" />
+          <option name="language" value="fortran" />
+          <option name="compilerType" value="fortran" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;javacdefault&quot;,&quot;name&quot;:&quot;javac default&quot;,&quot;lang&quot;:&quot;java&quot;,&quot;compilerType&quot;:&quot;java&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;java&quot;}" />
+          <option name="id" value="javacdefault" />
+          <option name="name" value="javac default" />
+          <option name="language" value="java" />
+          <option name="compilerType" value="java" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;julia&quot;,&quot;name&quot;:&quot;julia&quot;,&quot;lang&quot;:&quot;julia&quot;,&quot;compilerType&quot;:&quot;julia&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="julia" />
+          <option name="name" value="julia" />
+          <option name="language" value="julia" />
+          <option name="compilerType" value="julia" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;llc&quot;,&quot;name&quot;:&quot;llc&quot;,&quot;lang&quot;:&quot;llvm&quot;,&quot;compilerType&quot;:&quot;llc&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="llc" />
+          <option name="name" value="llc" />
+          <option name="language" value="llvm" />
+          <option name="compilerType" value="llc" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;mirllc&quot;,&quot;name&quot;:&quot;llc&quot;,&quot;lang&quot;:&quot;llvm_mir&quot;,&quot;compilerType&quot;:&quot;llc&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="mirllc" />
+          <option name="name" value="llc" />
+          <option name="language" value="llvm_mir" />
+          <option name="compilerType" value="llc" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;llvm-mcatrunkdef&quot;,&quot;name&quot;:&quot;llvm-mca (trunk)&quot;,&quot;lang&quot;:&quot;analysis&quot;,&quot;compilerType&quot;:&quot;llvm-mca&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="llvm-mcatrunkdef" />
+          <option name="name" value="llvm-mca (trunk)" />
+          <option name="language" value="analysis" />
+          <option name="compilerType" value="llvm-mca" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;llvmtblgen&quot;,&quot;name&quot;:&quot;llvm-tblgen&quot;,&quot;lang&quot;:&quot;tablegen&quot;,&quot;compilerType&quot;:&quot;tablegen&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="llvmtblgen" />
+          <option name="name" value="llvm-tblgen" />
+          <option name="language" value="tablegen" />
+          <option name="compilerType" value="tablegen" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;ocamllocal&quot;,&quot;name&quot;:&quot;ocamllocal&quot;,&quot;lang&quot;:&quot;ocaml&quot;,&quot;compilerType&quot;:&quot;ocaml&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="ocamllocal" />
+          <option name="name" value="ocamllocal" />
+          <option name="language" value="ocaml" />
+          <option name="compilerType" value="ocaml" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;opt&quot;,&quot;name&quot;:&quot;opt&quot;,&quot;lang&quot;:&quot;llvm&quot;,&quot;compilerType&quot;:&quot;opt&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;llvm&quot;}" />
+          <option name="id" value="opt" />
+          <option name="name" value="opt" />
+          <option name="language" value="llvm" />
+          <option name="compilerType" value="opt" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;rustc&quot;,&quot;name&quot;:&quot;rustc&quot;,&quot;lang&quot;:&quot;rust&quot;,&quot;compilerType&quot;:&quot;rust&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="rustc" />
+          <option name="name" value="rustc" />
+          <option name="language" value="rust" />
+          <option name="compilerType" value="rust" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;v8113&quot;,&quot;name&quot;:&quot;v8113&quot;,&quot;lang&quot;:&quot;javascript&quot;,&quot;compilerType&quot;:&quot;v8&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="v8113" />
+          <option name="name" value="v8113" />
+          <option name="language" value="javascript" />
+          <option name="compilerType" value="v8" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="rawData" value="{&quot;id&quot;:&quot;v8trunk&quot;,&quot;name&quot;:&quot;v8trunk&quot;,&quot;lang&quot;:&quot;javascript&quot;,&quot;compilerType&quot;:&quot;v8&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+          <option name="id" value="v8trunk" />
+          <option name="name" value="v8trunk" />
+          <option name="language" value="javascript" />
+          <option name="compilerType" value="v8" />
+        </RemoteCompilerInfo>
+      </list>
+    </option>
+    <option name="remoteLibraries">
+      <map>
+        <entry key="C++">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="localCompilerSettings">
+      <map>
+        <entry>
+          <key>
+            <LocalCompilerPath>
+              <option name="path" value="/usr/bin/g++" />
+            </LocalCompilerPath>
+          </key>
+          <value>
+            <LocalCompilerSettings>
+              <option name="name" value="GCC" />
+              <option name="version" value="13.2.0" />
+              <option name="target" value="x86_64" />
+            </LocalCompilerSettings>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="compilerMatches">
+      <map>
+        <entry>
+          <key>
+            <LocalCompilerPath>
+              <option name="path" value="/usr/bin/g++" />
+            </LocalCompilerPath>
+          </key>
+          <value>
+            <CompilerMatches>
+              <option name="chosenMatch">
+                <CompilerMatch>
+                  <option name="remoteCompilerInfo">
+                    <RemoteCompilerInfo>
+                      <option name="rawData" value="{&quot;id&quot;:&quot;gdefault&quot;,&quot;name&quot;:&quot;g++ default&quot;,&quot;lang&quot;:&quot;c++&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                      <option name="id" value="gdefault" />
+                      <option name="name" value="g++ default" />
+                      <option name="language" value="c++" />
+                    </RemoteCompilerInfo>
+                  </option>
+                </CompilerMatch>
+              </option>
+              <option name="otherMatches">
+                <list>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="rawData" value="{&quot;id&quot;:&quot;circledefault&quot;,&quot;name&quot;:&quot;circle default&quot;,&quot;lang&quot;:&quot;circle&quot;,&quot;compilerType&quot;:&quot;circle&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                        <option name="id" value="circledefault" />
+                        <option name="name" value="circle default" />
+                        <option name="language" value="circle" />
+                        <option name="compilerType" value="circle" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="rawData" value="{&quot;id&quot;:&quot;clangdefault&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;c++&quot;,&quot;compilerType&quot;:&quot;clang&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                        <option name="id" value="clangdefault" />
+                        <option name="name" value="clang default" />
+                        <option name="language" value="c++" />
+                        <option name="compilerType" value="clang" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="rawData" value="{&quot;id&quot;:&quot;cppforopenclclangdefault&quot;,&quot;name&quot;:&quot;clang default&quot;,&quot;lang&quot;:&quot;cpp_for_opencl&quot;,&quot;compilerType&quot;:&quot;clang&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                        <option name="id" value="cppforopenclclangdefault" />
+                        <option name="name" value="clang default" />
+                        <option name="language" value="cpp_for_opencl" />
+                        <option name="compilerType" value="clang" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="rawData" value="{&quot;id&quot;:&quot;spirvcppclangdefaultspir&quot;,&quot;name&quot;:&quot;clang default (SPIR-V asm, spir triple)&quot;,&quot;lang&quot;:&quot;cpp_for_opencl&quot;,&quot;compilerType&quot;:&quot;spirv&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                        <option name="id" value="spirvcppclangdefaultspir" />
+                        <option name="name" value="clang default (SPIR-V asm, spir triple)" />
+                        <option name="language" value="cpp_for_opencl" />
+                        <option name="compilerType" value="spirv" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="rawData" value="{&quot;id&quot;:&quot;spirvcppclangdefaultspir64&quot;,&quot;name&quot;:&quot;clang default (SPIR-V asm, spir64 triple)&quot;,&quot;lang&quot;:&quot;cpp_for_opencl&quot;,&quot;compilerType&quot;:&quot;spirv&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                        <option name="id" value="spirvcppclangdefaultspir64" />
+                        <option name="name" value="clang default (SPIR-V asm, spir64 triple)" />
+                        <option name="language" value="cpp_for_opencl" />
+                        <option name="compilerType" value="spirv" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="rawData" value="{&quot;id&quot;:&quot;gdefault&quot;,&quot;name&quot;:&quot;g++ default&quot;,&quot;lang&quot;:&quot;c++&quot;,&quot;compilerType&quot;:&quot;&quot;,&quot;semver&quot;:&quot;&quot;,&quot;instructionSet&quot;:&quot;amd64&quot;}" />
+                        <option name="id" value="gdefault" />
+                        <option name="name" value="g++ default" />
+                        <option name="language" value="c++" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                </list>
+              </option>
+            </CompilerMatches>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="additionalSwitches" value="-fverbose-asm -O3" />
+    <option name="scrollPositions">
+      <map>
+        <entry key="PREPROCESSOR_OUTPUT" value="0" />
+        <entry key="EXPLORER_SITE_INFO" value="0" />
+        <entry key="EXPLORER_OUTPUT" value="1764" />
+      </map>
+    </option>
+    <option name="scrollPositionsError">
+      <map>
+        <entry key="EXPLORER_SITE_INFO" value="-341" />
+        <entry key="EXPLORER_OUTPUT" value="0" />
+      </map>
+    </option>
+    <option name="initialNoticeShown" value="true" />
+  </component>
+</project>
