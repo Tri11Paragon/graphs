@@ -33,13 +33,17 @@ void init(const blt::gfx::window_context& context)
     using namespace blt::gfx;
     
     resources.enqueue("../res/debian.png", "debian");
-    resources.enqueue("../res/john256.png", "john");
+    resources.enqueue("../res/parker.png", "parker");
+    resources.enqueue("../res/parker cat ears.jpg", "parkercat");
     
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
     
-    render_texture = fbo_t::make_render_texture(1440, 720);
+    //render_texture = fbo_t::make_multisample_render_texture(1440, 720, 4);
+    render_texture = fbo_t::make_multisample_render_target(1440, 720, 8);
+    //render_texture = fbo_t::make_render_target(1440, 720);
+    //render_texture = fbo_t::make_render_texture(1440, 720);
 }
 
 float x = 50, y = 50;
@@ -48,8 +52,13 @@ float ax = 0.05, ay = 0.05;
 
 void update(const blt::gfx::window_context& context, std::int32_t width, std::int32_t height)
 {
-    //render_texture.bind();
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    /*render_texture.bind();
+    if (width != render_texture.getWidth() || height != render_texture.getHeight())
+    {
+        //BLT_TRACE("updating from %d %d to %d %d", render_texture.getWidth(), render_texture.getHeight(), width, height);
+        render_texture.updateBuffersStorage(width, height);
+    }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);*/
     global_matrices.update_perspectives(width, height, 90, 0.1, 2000);
     
     x += sx;
@@ -66,7 +75,7 @@ void update(const blt::gfx::window_context& context, std::int32_t width, std::in
     renderer_2d.drawLine(blt::vec4{1, 0, 1, 1}, 0.0f, blt::vec2{x,y}, blt::vec2{500, 500}, 5.0f);
     renderer_2d.drawLine(blt::vec4{1, 0, 0, 1}, 0.0f, blt::vec2{0,150}, blt::vec2{240, 0}, 12.0f);
     renderer_2d.drawPoint(blt::vec4{0, 1, 0, 1}, 1.0f, blt::vec2{500, 500}, 50.0f);
-    renderer_2d.drawPoint("john", 1.0f, blt::vec2{800, 500}, 256.0f);
+    renderer_2d.drawPoint("parkercat", 1.0f, blt::vec2{800, 500}, 256.0f);
     //renderer_2d.drawRectangle(blt::vec4{1,1,1,1}, -1.0f, blt::vec2{width / 2.0, height / 2.0}, blt::vec2{width, height});
     
     camera.update();
@@ -75,6 +84,7 @@ void update(const blt::gfx::window_context& context, std::int32_t width, std::in
     
     renderer_2d.render();
     //blt::gfx::fbo_t::unbind();
+    //render_texture.blitToScreen(width, height);
 }
 
 int main(int argc, const char** argv)
