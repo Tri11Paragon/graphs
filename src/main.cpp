@@ -94,4 +94,6 @@ int main(int argc, const char** argv)
     resources.cleanup();
     renderer_2d.cleanup();
     blt::gfx::cleanup();
+    
+    return 0;
 }

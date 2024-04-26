@@ -1,0 +1,3 @@
+file(REMOVE_RECURSE
+  "libBLT_WITH_GRAPHICS.a"
+)
