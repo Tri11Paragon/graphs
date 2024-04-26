@@ -1,1 +1,0 @@
-/home/brett/Documents/git/emsdk/upstream/emscripten/em++ -O2 -g -DNDEBUG -sMAX_WEBGL_VERSION=2 -sASSERTIONS=1 -sUSE_GLFW=3 -Wall -Wextra -Wno-comment @CMakeFiles/graphs.dir/objects1 -o graphs.js @CMakeFiles/graphs.dir/linkLibs.rsp
