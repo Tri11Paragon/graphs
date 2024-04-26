@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(graphs VERSION 0.0.15)
+project(graphs VERSION 0.0.16)
 
 option(ENABLE_ADDRSAN "Enable the address sanitizer" OFF)
 option(ENABLE_UBSAN "Enable the ub sanitizer" OFF)
@@ -38,5 +38,6 @@ if (${ENABLE_TSAN} MATCHES ON)
 endif ()
 
 if (EMSCRIPTEN)
-    set_target_properties(graphs PROPERTIES LINK_FLAGS "-sMAX_WEBGL_VERSION=2 -sASSERTIONS=1 -sUSE_GLFW=3")
+    set(BLT_PRELOAD_PATH "../res@../res")
+    include(lib/BLT-With-Graphics-Template/cmake/link_flags.cmake)
 endif ()

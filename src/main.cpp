@@ -28,13 +28,20 @@ blt::gfx::batch_renderer_2d renderer_2d(resources);
 blt::gfx::first_person_camera camera;
 blt::gfx::fbo_t render_texture;
 
+#ifdef __EMSCRIPTEN__
+    std::string resource_prefix = "../";
+#else
+    std::string resource_prefix = "../";
+#endif
+
 void init(const blt::gfx::window_context& context)
 {
     using namespace blt::gfx;
+    resources.setPrefixDirectory(resource_prefix);
     
-    resources.enqueue("./res/debian.png", "debian");
-    resources.enqueue("./res/parker.png", "parker");
-    resources.enqueue("./res/parker cat ears.jpg", "parkercat");
+    resources.enqueue("res/debian.png", "debian");
+    resources.enqueue("res/parker.png", "parker");
+    resources.enqueue("res/parker cat ears.jpg", "parkercat");
     
     global_matrices.create_internals();
     resources.load_resources();
