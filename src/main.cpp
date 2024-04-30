@@ -607,7 +607,7 @@ void update(const blt::gfx::window_data& data)
             auto current_sim = main_graph.getSimulatorName();
             const char* items[] = {"Eades", "Fruchterman & Reingold"};
             static int item_current = 0;
-            ImGui::ListBox("", &item_current, items, IM_ARRAYSIZE(items), 4);
+            ImGui::ListBox("##SillyBox", &item_current, items, 2, 2);
             
             if (strcmp(items[item_current], current_sim.c_str()) != 0)
             {
