@@ -439,12 +439,12 @@ class graph
             
             auto adj_mv = ovm * blt::vec4(mv.x(), mv.y(), 0, 1);
             auto adj_size = ovm * blt::vec4(POINT_SIZE, POINT_SIZE, POINT_SIZE, POINT_SIZE);
-            float new_size = std::max(std::abs(adj_size.x()), std::abs(adj_size.y()))
+            float new_size = std::max(std::abs(adj_size.x()), std::abs(adj_size.y()));
             
-            BLT_TRACE_STREAM << "adj_mv: ";
-            BLT_TRACE_STREAM << adj_mv << "\n";
-            BLT_TRACE_STREAM << "adj_size: ";
-            BLT_TRACE_STREAM << adj_size << "\n";
+            //BLT_TRACE_STREAM << "adj_mv: ";
+            //BLT_TRACE_STREAM << adj_mv << "\n";
+            //BLT_TRACE_STREAM << "adj_size: ";
+            //BLT_TRACE_STREAM << adj_size << "\n";
             
             if (current_node < 0)
             {
@@ -466,8 +466,8 @@ class graph
             {
                 auto pos = nodes[current_node].getPosition();
                 auto adj_pos = ovm * blt::vec4(pos.x(), pos.y(), 0, 1);
-                BLT_TRACE_STREAM << "adj_pos: ";
-                BLT_TRACE_STREAM << adj_pos << "\n";
+                //BLT_TRACE_STREAM << "adj_pos: ";
+                //BLT_TRACE_STREAM << adj_pos << "\n";
                 nodes[current_node].getPositionRef() = mv;
             }
         }
