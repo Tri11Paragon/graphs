@@ -32,7 +32,6 @@ blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
 blt::gfx::batch_renderer_2d renderer_2d(resources);
 blt::gfx::first_person_camera_2d camera;
-blt::gfx::fbo_t render_texture;
 blt::u64 lastTime;
 double ft = 0;
 double fps = 0;
@@ -107,13 +106,16 @@ struct edge_hash
 
 struct equation_variables
 {
-    float repulsive_constant = 12.0;
-    float spring_constant = 24.0;
+    float repulsive_constant = 24.0;
+    float spring_constant = 12.0;
     float ideal_spring_length = 175.0;
     float initial_temperature = 69.5;
     float cooling_rate = 0.999;
+    float min_cooling = 0;
     
     equation_variables() = default;
+    //equation_variables(const equation_variables&) = delete;
+    //equation_variables& operator=(const equation_variables&) = delete;
 };
 
 class force_equation
@@ -125,10 +127,10 @@ class force_equation
         
         struct equation_data
         {
-            blt::vec2 unit;
+            blt::vec2 unit, unit_inv;
             float mag, mag_sq;
             
-            equation_data(blt::vec2 unit, float mag, float mag_sq): unit(unit), mag(mag), mag_sq(mag_sq)
+            equation_data(blt::vec2 unit, blt::vec2 unit_inv, float mag, float mag_sq): unit(unit), unit_inv(unit_inv), mag(mag), mag_sq(mag_sq)
             {}
         };
         
@@ -140,10 +142,13 @@ class force_equation
         inline static equation_data calc_data(node_pair v1, node_pair v2)
         {
             auto dir = dir_v(v1, v2);
+            auto dir2 = dir_v(v2, v1);
             auto mag = dir.magnitude();
+            auto mag2 = dir2.magnitude();
             auto unit = mag == 0 ? blt::vec2() : dir / mag;
+            auto unit_inv = mag2 == 0 ? blt::vec2() : dir2 / mag2;
             auto mag_sq = mag * mag;
-            return {unit, mag, mag_sq};
+            return {unit, unit_inv, mag, mag_sq};
         }
     
     public:
@@ -159,7 +164,7 @@ class force_equation
         
         [[nodiscard]] virtual float cooling_factor(int t) const
         {
-            return static_cast<float>(variables.initial_temperature * std::pow(variables.cooling_rate, t));
+            return std::max(static_cast<float>(variables.initial_temperature * std::pow(variables.cooling_rate, t)), variables.min_cooling);
         }
         
         virtual ~force_equation() = default;
@@ -175,19 +180,18 @@ class Eades_equation : public force_equation
         {
             auto data = calc_data(v1, v2);
             
-            BLT_TRACE(&variables);
-            
             auto ideal = std::log(data.mag / variables.ideal_spring_length);
             
-            return variables.spring_constant * ideal * data.unit;
+            return (variables.spring_constant * ideal * data.unit) - rep(v1, v2);
         }
         
         [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final
         {
             auto data = calc_data(v1, v2);
             
-            auto scale = variables.repulsive_constant / data.mag_sq;
-            return scale * -data.unit;
+            // scaling factor included because of the scales this algorithm is working on (large viewport)
+            auto scale = (variables.repulsive_constant * 10000) / data.mag_sq;
+            return scale * data.unit_inv;
         }
         
         [[nodiscard]] std::string name() const final
@@ -208,7 +212,7 @@ class Fruchterman_Reingold_equation : public force_equation
             
             float scale = data.mag_sq / variables.ideal_spring_length;
             
-            return scale * data.unit;
+            return (scale * data.unit);
         }
         
         [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final
@@ -217,7 +221,7 @@ class Fruchterman_Reingold_equation : public force_equation
             
             float scale = (variables.ideal_spring_length * variables.ideal_spring_length) / data.mag;
             
-            return scale * -data.unit;
+            return scale * data.unit_inv;
         }
         
         [[nodiscard]] float cooling_factor(int t) const override
@@ -247,18 +251,21 @@ struct bounding_box
 class graph
 {
     private:
+        equation_variables variables;
         std::vector<node> nodes;
         blt::hashset_t<edge, edge_hash> edges;
         blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64>> connected_nodes;
         bool sim = false;
+        bool run_infinitely = true;
         float sim_speed = 1;
         float threshold = 0.01;
         float max_force_last = 1;
         int current_iterations = 0;
         int max_iterations = 5000;
-        equation_variables variables;
         std::unique_ptr<force_equation> equation;
         static constexpr float POINT_SIZE = 35;
+        
+        blt::i32 current_node = -1;
         
         void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
         {
@@ -339,9 +346,8 @@ class graph
     public:
         graph() = default;
         
-        graph(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
+        void make_new(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
         {
-            BLT_DEBUG(&variables);
             create_random_graph(bb, min_nodes, max_nodes, connectivity);
             use_Eades();
         }
@@ -371,9 +377,8 @@ class graph
         
         void render(double frame_time)
         {
-            if (sim && current_iterations < max_iterations && max_force_last > threshold)
+            if (sim && (current_iterations < max_iterations || run_infinitely) && max_force_last > threshold)
             {
-                BLT_INFO(&variables);
                 for (int _ = 0; _ < sub_ticks; _++)
                 {
                     // calculate new forces
@@ -385,7 +390,8 @@ class graph
                         {
                             if (v1.first == v2.first)
                                 continue;
-                            attractive += equation->attr(v1, v2);
+                            if (connected(v1.first, v2.first))
+                                attractive += equation->attr(v1, v2);
                             repulsive += equation->rep(v1, v2);
                         }
                         v1.second.getVelocityRef() = attractive + repulsive;
@@ -418,6 +424,54 @@ class graph
             }
         }
         
+        void reset_mouse_drag()
+        {
+            current_node = -1;
+        }
+        
+        void process_mouse_drag(blt::i32, blt::i32 height)
+        {
+            auto mx = static_cast<float>(blt::gfx::getMouseX());
+            auto my = static_cast<float>(height - blt::gfx::getMouseY());
+            auto mv = blt::vec2(mx, my);
+            
+            const auto& ovm = global_matrices.computedOVM();
+            
+            auto adj_mv = ovm * blt::vec4(mv.x(), mv.y(), 0, 1);
+            auto adj_size = ovm * blt::vec4(POINT_SIZE, POINT_SIZE, POINT_SIZE, POINT_SIZE);
+            float new_size = std::max(std::abs(adj_size.x()), std::abs(adj_size.y()))
+            
+            BLT_TRACE_STREAM << "adj_mv: ";
+            BLT_TRACE_STREAM << adj_mv << "\n";
+            BLT_TRACE_STREAM << "adj_size: ";
+            BLT_TRACE_STREAM << adj_size << "\n";
+            
+            if (current_node < 0)
+            {
+                
+                for (const auto& n : blt::enumerate(nodes))
+                {
+                    auto pos = n.second.getPosition();
+                    
+                    auto dist = pos - mv;
+                    auto mag = dist.magnitude();
+                    
+                    if (mag < POINT_SIZE)
+                    {
+                        current_node = static_cast<blt::i32>(n.first);
+                        break;
+                    }
+                }
+            } else
+            {
+                auto pos = nodes[current_node].getPosition();
+                auto adj_pos = ovm * blt::vec4(pos.x(), pos.y(), 0, 1);
+                BLT_TRACE_STREAM << "adj_pos: ";
+                BLT_TRACE_STREAM << adj_pos << "\n";
+                nodes[current_node].getPositionRef() = mv;
+            }
+        }
+        
         void use_Eades()
         {
             equation = std::make_unique<Eades_equation>(variables);
@@ -443,6 +497,21 @@ class graph
             return equation->name();
         }
         
+        auto getCoolingFactor()
+        {
+            return equation->cooling_factor(current_iterations);
+        }
+        
+        void reset_iterations()
+        {
+            current_iterations = 0;
+        }
+        
+        bool& getIterControl()
+        {
+            return run_infinitely;
+        }
+        
         float& getSimSpeed()
         {
             return sim_speed;
@@ -453,29 +522,9 @@ class graph
             return threshold;
         }
         
-        float& getSpringConstant()
+        auto& getVariables()
         {
-            return variables.spring_constant;
-        }
-        
-        float& getInitialTemperature()
-        {
-            return variables.initial_temperature;
-        }
-        
-        float& getCoolingRate()
-        {
-            return variables.cooling_rate;
-        }
-        
-        float& getIdealSpringLength()
-        {
-            return variables.ideal_spring_length;
-        }
-        
-        float& getRepulsionConstant()
-        {
-            return variables.repulsive_constant;
+            return variables;
         }
         
         int& getMaxIterations()
@@ -511,13 +560,8 @@ void init(const blt::gfx::window_data& data)
     renderer_2d.create();
     
     bounding_box bb(0, 0, data.width, data.height);
-    main_graph = graph(bb, 5, 25, 0.2);
+    main_graph.make_new(bb, 5, 25, 0.2);
     lastTime = blt::system::nanoTime();
-    
-    //render_texture = fbo_t::make_multisample_render_texture(1440, 720, 4);
-    //render_texture = fbo_t::make_multisample_render_target(1440, 720, 8);
-    //render_texture = fbo_t::make_render_target(1440, 720);
-    //render_texture = fbo_t::make_render_texture(1440, 720);
 }
 
 float x = 50, y = 50;
@@ -545,7 +589,7 @@ void update(const blt::gfx::window_data& data)
         static int min_nodes = 5;
         static int max_nodes = 25;
         
-        static bounding_box bb {0, 0, data.width, data.height};
+        static bounding_box bb{0, 0, data.width, data.height};
         
         static float connectivity = 0.12;
         
@@ -555,7 +599,8 @@ void update(const blt::gfx::window_data& data)
         im::SetNextItemOpen(true, ImGuiCond_Once);
         if (im::CollapsingHeader("Help"))
         {
-        
+            im::Text("You can use W/A/S/D to move the camera around");
+            im::Text("Q/E can be used to zoom in/out the camera");
         }
         if (im::CollapsingHeader("Graph Generation Settings"))
         {
@@ -590,25 +635,29 @@ void update(const blt::gfx::window_data& data)
         if (im::CollapsingHeader("Simulation Settings"))
         {
             im::InputInt("Max Iterations", &main_graph.getMaxIterations());
+            im::Checkbox("Run Infinitely", &main_graph.getIterControl());
             im::InputInt("Sub-ticks Per Frame", &sub_ticks);
             im::InputFloat("Threshold", &main_graph.getThreshold(), 0.01, 1);
-            im::InputFloat("Repulsive Constant", &main_graph.getRepulsionConstant(), 0.25, 10);
-            im::InputFloat("Spring Constant", &main_graph.getSpringConstant(), 0.25, 10);
-            im::InputFloat("Ideal Spring Length", &main_graph.getIdealSpringLength(), 2.5, 10);
-            im::SliderFloat("Initial Temperature", &main_graph.getInitialTemperature(), 1, 100);
-            im::SliderFloat("Cooling Rate", &main_graph.getCoolingRate(), 0, 0.999999, "%.6f");
+            im::InputFloat("Repulsive Constant", &main_graph.getVariables().repulsive_constant, 0.25, 10);
+            im::InputFloat("Spring Constant", &main_graph.getVariables().spring_constant, 0.25, 10);
+            im::InputFloat("Ideal Spring Length", &main_graph.getVariables().ideal_spring_length, 2.5, 10);
+            im::SliderFloat("Initial Temperature", &main_graph.getVariables().initial_temperature, 1, 100);
+            im::SliderFloat("Cooling Rate", &main_graph.getVariables().cooling_rate, 0, 0.999999, "%.6f");
+            im::InputFloat("Min Cooling", &main_graph.getVariables().min_cooling, 0.5, 1);
+            im::Text("Current Cooling Factor: %f", main_graph.getCoolingFactor());
             im::SliderFloat("Simulation Speed", &main_graph.getSimSpeed(), 0, 4);
             if (im::Button("Start"))
                 main_graph.start_sim();
             im::SameLine();
             if (im::Button("Stop"))
                 main_graph.stop_sim();
+            if (im::Button("Reset Iterations"))
+                main_graph.reset_iterations();
         }
         im::SetNextItemOpen(true, ImGuiCond_Once);
         if (im::CollapsingHeader("System Controls"))
         {
-            //im::Text("Current System: %s", main_graph.getSimulatorName().c_str());
-            //im::
+            im::Text("Select a system:");
             auto current_sim = main_graph.getSimulatorName();
             const char* items[] = {"Eades", "Fruchterman & Reingold"};
             static int item_current = 0;
@@ -635,10 +684,12 @@ void update(const blt::gfx::window_data& data)
         im::End();
     }
     
-    //renderer_2d.drawLine(blt::vec4{1, 0, 1, 1}, 0.0f, blt::vec2{x, y}, blt::vec2{500, 500}, 5.0f);
-    //renderer_2d.drawLine(blt::vec4{1, 0, 0, 1}, 0.0f, blt::vec2{0, 150}, blt::vec2{240, 0}, 12.0f);
-    //renderer_2d.drawPoint(blt::vec4{0, 1, 0, 1}, 1.0f, blt::vec2{500, 500}, 50.0f);
-    //renderer_2d.drawPoint("parkercat", 1.0f, blt::vec2{800, 500}, 256.0f);
+    auto& io = ImGui::GetIO();
+    
+    if (!io.WantCaptureMouse && blt::gfx::isMousePressed(0))
+        main_graph.process_mouse_drag(data.width, data.height);
+    else
+        main_graph.reset_mouse_drag();
     
     main_graph.render(ft);
     
