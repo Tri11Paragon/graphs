@@ -73,9 +73,9 @@ class node
 class edge
 {
     private:
-        blt::size_t i1, i2;
+        blt::u64 i1, i2;
     public:
-        edge(blt::size_t i1, blt::size_t i2): i1(i1), i2(i2)
+        edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
             BLT_ASSERT(i1 != i2 && "Indices cannot be equal!");
         }
