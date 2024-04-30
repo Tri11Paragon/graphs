@@ -21,6 +21,7 @@
 #include "blt/gfx/renderer/camera.h"
 #include <blt/gfx/framebuffer.h>
 #include <imgui.h>
+#include <memory>
 #include <random>
 #include <blt/std/ranges.h>
 #include <blt/std/assert.h>
@@ -111,6 +112,8 @@ struct equation_variables
     float ideal_spring_length = 175.0;
     float initial_temperature = 69.5;
     float cooling_rate = 0.999;
+    
+    equation_variables() = default;
 };
 
 class force_equation
@@ -118,7 +121,7 @@ class force_equation
     public:
         using node_pair = const std::pair<blt::size_t, node>&;
     protected:
-        const equation_variables variables;
+        const equation_variables& variables;
         
         struct equation_data
         {
@@ -171,6 +174,8 @@ class Eades_equation : public force_equation
         [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2) const final
         {
             auto data = calc_data(v1, v2);
+            
+            BLT_TRACE(&variables);
             
             auto ideal = std::log(data.mag / variables.ideal_spring_length);
             
@@ -336,6 +341,7 @@ class graph
         
         graph(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
         {
+            BLT_DEBUG(&variables);
             create_random_graph(bb, min_nodes, max_nodes, connectivity);
             use_Eades();
         }
@@ -367,6 +373,7 @@ class graph
         {
             if (sim && current_iterations < max_iterations && max_force_last > threshold)
             {
+                BLT_INFO(&variables);
                 for (int _ = 0; _ < sub_ticks; _++)
                 {
                     // calculate new forces
@@ -561,9 +568,7 @@ void update(const blt::gfx::window_data& data)
                 result |= im::InputInt("Min Y", &bb.min_y, 5, 100);
                 result |= im::InputInt("Max Y", &bb.max_y, 5, 100);
                 if (result)
-                {
                     bb.is_screen = false;
-                }
             }
             if (bb.is_screen)
             {
