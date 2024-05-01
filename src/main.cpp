@@ -698,10 +698,11 @@ void update(const blt::gfx::window_data& data)
     camera.update_view(global_matrices);
     global_matrices.update();
     
+    //renderer_2d.drawPoint(blt::make_color(1, 0, 0), blt::vec2(0, 0), 50);
+    //renderer_2d.drawPoint(blt::make_color(1, 0, 0), blt::vec2(data.width, data.height), 50);
     renderer_2d.render();
     
-    auto d2 = global_matrices.getScale2D();
-    BLT_TRACE_STREAM << blt::gfx::calculateRay2D(static_cast<float>(data.width), static_cast<float>(data.height), blt::vec2(d2.x(), d2.y()),
+    BLT_TRACE_STREAM << blt::gfx::calculateRay2D(static_cast<float>(data.width), static_cast<float>(data.height), global_matrices.getScale2D(),
                                                  global_matrices.getView2D(), global_matrices.getOrtho()) << "\n";
     
     auto currentTime = blt::system::nanoTime();
