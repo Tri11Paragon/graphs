@@ -20,6 +20,7 @@
 #include "blt/gfx/renderer/batch_2d_renderer.h"
 #include "blt/gfx/renderer/camera.h"
 #include <blt/gfx/framebuffer.h>
+#include <blt/gfx/raycast.h>
 #include <imgui.h>
 #include <memory>
 #include <random>
@@ -698,6 +699,10 @@ void update(const blt::gfx::window_data& data)
     global_matrices.update();
     
     renderer_2d.render();
+    
+    auto d2 = global_matrices.getScale2D();
+    BLT_TRACE_STREAM << blt::gfx::calculateRay2D(static_cast<float>(data.width), static_cast<float>(data.height), blt::vec2(d2.x(), d2.y()),
+                                                 global_matrices.getView2D(), global_matrices.getOrtho()) << "\n";
     
     auto currentTime = blt::system::nanoTime();
     auto diff = currentTime - lastTime;
