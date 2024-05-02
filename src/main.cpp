@@ -25,9 +25,11 @@
 #include <memory>
 #include <random>
 #include <blt/std/ranges.h>
-#include <blt/std/assert.h>
 #include <blt/std/time.h>
 #include <blt/math/log_util.h>
+
+#include <graph_base.h>
+#include <force_algorithms.h>
 
 blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
@@ -39,202 +41,6 @@ double fps = 0;
 int sub_ticks = 1;
 
 namespace im = ImGui;
-
-class node
-{
-    private:
-        blt::gfx::point2d_t point;
-        blt::vec2 velocity;
-    public:
-        explicit node(const blt::gfx::point2d_t& point): point(point)
-        {}
-        
-        blt::vec2& getVelocityRef()
-        {
-            return velocity;
-        }
-        
-        blt::vec2& getPositionRef()
-        {
-            return point.pos;
-        }
-        
-        [[nodiscard]] const blt::vec2& getPosition() const
-        {
-            return point.pos;
-        }
-        
-        [[nodiscard]] auto& getRenderObj() const
-        {
-            return point;
-        }
-};
-
-
-class edge
-{
-    private:
-        blt::u64 i1, i2;
-    public:
-        edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
-        {
-            BLT_ASSERT(i1 != i2 && "Indices cannot be equal!");
-        }
-        
-        inline friend bool operator==(edge e1, edge e2)
-        {
-            return (e1.i1 == e2.i1 || e1.i1 == e2.i2) && (e1.i2 == e2.i1 || e1.i2 == e2.i2);
-        }
-        
-        [[nodiscard]] size_t getFirst() const
-        {
-            return i1;
-        }
-        
-        [[nodiscard]] size_t getSecond() const
-        {
-            return i2;
-        }
-};
-
-struct edge_hash
-{
-    blt::u64 operator()(const edge& e) const
-    {
-        return e.getFirst() * e.getSecond();
-    }
-};
-
-struct equation_variables
-{
-    float repulsive_constant = 24.0;
-    float spring_constant = 12.0;
-    float ideal_spring_length = 175.0;
-    float initial_temperature = 69.5;
-    float cooling_rate = 0.999;
-    float min_cooling = 0;
-    
-    equation_variables() = default;
-    //equation_variables(const equation_variables&) = delete;
-    //equation_variables& operator=(const equation_variables&) = delete;
-};
-
-class force_equation
-{
-    public:
-        using node_pair = const std::pair<blt::size_t, node>&;
-    protected:
-        const equation_variables& variables;
-        
-        struct equation_data
-        {
-            blt::vec2 unit, unit_inv;
-            float mag, mag_sq;
-            
-            equation_data(blt::vec2 unit, blt::vec2 unit_inv, float mag, float mag_sq): unit(unit), unit_inv(unit_inv), mag(mag), mag_sq(mag_sq)
-            {}
-        };
-        
-        inline static blt::vec2 dir_v(node_pair v1, node_pair v2)
-        {
-            return v2.second.getPosition() - v1.second.getPosition();
-        }
-        
-        inline static equation_data calc_data(node_pair v1, node_pair v2)
-        {
-            auto dir = dir_v(v1, v2);
-            auto dir2 = dir_v(v2, v1);
-            auto mag = dir.magnitude();
-            auto mag2 = dir2.magnitude();
-            auto unit = mag == 0 ? blt::vec2() : dir / mag;
-            auto unit_inv = mag2 == 0 ? blt::vec2() : dir2 / mag2;
-            auto mag_sq = mag * mag;
-            return {unit, unit_inv, mag, mag_sq};
-        }
-    
-    public:
-        
-        explicit force_equation(const equation_variables& variables): variables(variables)
-        {}
-        
-        [[nodiscard]] virtual blt::vec2 attr(node_pair v1, node_pair v2) const = 0;
-        
-        [[nodiscard]] virtual blt::vec2 rep(node_pair v1, node_pair v2) const = 0;
-        
-        [[nodiscard]] virtual std::string name() const = 0;
-        
-        [[nodiscard]] virtual float cooling_factor(int t) const
-        {
-            return std::max(static_cast<float>(variables.initial_temperature * std::pow(variables.cooling_rate, t)), variables.min_cooling);
-        }
-        
-        virtual ~force_equation() = default;
-};
-
-class Eades_equation : public force_equation
-{
-    public:
-        explicit Eades_equation(const equation_variables& variables): force_equation(variables)
-        {}
-        
-        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2) const final
-        {
-            auto data = calc_data(v1, v2);
-            
-            auto ideal = std::log(data.mag / variables.ideal_spring_length);
-            
-            return (variables.spring_constant * ideal * data.unit) - rep(v1, v2);
-        }
-        
-        [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final
-        {
-            auto data = calc_data(v1, v2);
-            
-            // scaling factor included because of the scales this algorithm is working on (large viewport)
-            auto scale = (variables.repulsive_constant * 10000) / data.mag_sq;
-            return scale * data.unit_inv;
-        }
-        
-        [[nodiscard]] std::string name() const final
-        {
-            return "Eades";
-        }
-};
-
-class Fruchterman_Reingold_equation : public force_equation
-{
-    public:
-        explicit Fruchterman_Reingold_equation(const equation_variables& variables): force_equation(variables)
-        {}
-        
-        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2) const final
-        {
-            auto data = calc_data(v1, v2);
-            
-            float scale = data.mag_sq / variables.ideal_spring_length;
-            
-            return (scale * data.unit);
-        }
-        
-        [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final
-        {
-            auto data = calc_data(v1, v2);
-            
-            float scale = (variables.ideal_spring_length * variables.ideal_spring_length) / data.mag;
-            
-            return scale * data.unit_inv;
-        }
-        
-        [[nodiscard]] float cooling_factor(int t) const override
-        {
-            return force_equation::cooling_factor(t) * 0.025f;
-        }
-        
-        [[nodiscard]] std::string name() const final
-        {
-            return "Fruchterman & Reingold";
-        }
-};
 
 struct bounding_box
 {
@@ -249,17 +55,16 @@ struct bounding_box
     bool is_screen = true;
 };
 
-class graph
+class graph_t
 {
     private:
-        equation_variables variables;
         std::vector<node> nodes;
         blt::hashset_t<edge, edge_hash> edges;
         blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64>> connected_nodes;
         bool sim = false;
         bool run_infinitely = true;
         float sim_speed = 1;
-        float threshold = 0.01;
+        float threshold = 0;
         float max_force_last = 1;
         int current_iterations = 0;
         int max_iterations = 5000;
@@ -268,7 +73,8 @@ class graph
         
         blt::i32 current_node = -1;
         
-        void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
+        void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity, blt::f64 scaling_connectivity,
+                                 blt::f64 distance_factor)
         {
             // don't allow points too close to the edges of the window.
             if (bb.is_screen)
@@ -319,7 +125,16 @@ class graph
                 {
                     if (node1.first == node2.first)
                         continue;
-                    if (chance(dev) <= connectivity)
+                    auto diff = node2.second.getPosition() - node1.second.getPosition();
+                    auto diff_sq = (diff * diff);
+                    auto dist = distance_factor / static_cast<float>(std::sqrt(diff_sq.x() + diff_sq.y()));
+                    double dexp;
+                    if (dist == 0)
+                        dexp = 0;
+                    else
+                        dexp = 1 / (std::exp(dist) - dist);
+                    auto rand = chance(dev);
+                    if (rand <= connectivity && rand >= dexp * scaling_connectivity)
                         connect(node1.first, node2.first);
                 }
             }
@@ -345,15 +160,16 @@ class graph
         }
     
     public:
-        graph() = default;
+        graph_t() = default;
         
         void make_new(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
         {
-            create_random_graph(bb, min_nodes, max_nodes, connectivity);
+            create_random_graph(bb, min_nodes, max_nodes, connectivity, 0, 25);
             use_Eades();
         }
         
-        void reset(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
+        void reset(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity, blt::f64 scaling_connectivity,
+                   blt::f64 distance_factor)
         {
             sim = false;
             current_iterations = 0;
@@ -361,7 +177,7 @@ class graph
             nodes.clear();
             edges.clear();
             connected_nodes.clear();
-            create_random_graph(bb, min_nodes, max_nodes, connectivity);
+            create_random_graph(bb, min_nodes, max_nodes, connectivity, scaling_connectivity, distance_factor);
         }
         
         void connect(blt::u64 n1, blt::u64 n2)
@@ -410,7 +226,7 @@ class graph
             }
             
             for (const auto& point : nodes)
-                renderer_2d.drawPointInternal("parker", point.getRenderObj(), 10.0f);
+                renderer_2d.drawPointInternal("parker_point", point.getRenderObj(), 10.0f);
             for (const auto& edge : edges)
             {
                 if (edge.getFirst() >= nodes.size() || edge.getSecond() >= nodes.size())
@@ -430,22 +246,10 @@ class graph
             current_node = -1;
         }
         
-        void process_mouse_drag(blt::i32, blt::i32 height)
+        void process_mouse_drag(blt::i32 width, blt::i32 height)
         {
-            auto mx = static_cast<float>(blt::gfx::getMouseX());
-            auto my = static_cast<float>(height - blt::gfx::getMouseY());
-            auto mv = blt::vec2(mx, my);
-            
-            const auto& ovm = global_matrices.computedOVM();
-            
-            auto adj_mv = ovm * blt::vec4(mv.x(), mv.y(), 0, 1);
-            auto adj_size = ovm * blt::vec4(POINT_SIZE, POINT_SIZE, POINT_SIZE, POINT_SIZE);
-            float new_size = std::max(std::abs(adj_size.x()), std::abs(adj_size.y()));
-            
-            //BLT_TRACE_STREAM << "adj_mv: ";
-            //BLT_TRACE_STREAM << adj_mv << "\n";
-            //BLT_TRACE_STREAM << "adj_size: ";
-            //BLT_TRACE_STREAM << adj_size << "\n";
+            auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
+                                                                     global_matrices.getOrtho()));
             
             if (current_node < 0)
             {
@@ -454,7 +258,7 @@ class graph
                 {
                     auto pos = n.second.getPosition();
                     
-                    auto dist = pos - mv;
+                    auto dist = pos - mouse_pos;
                     auto mag = dist.magnitude();
                     
                     if (mag < POINT_SIZE)
@@ -465,22 +269,18 @@ class graph
                 }
             } else
             {
-                auto pos = nodes[current_node].getPosition();
-                auto adj_pos = ovm * blt::vec4(pos.x(), pos.y(), 0, 1);
-                //BLT_TRACE_STREAM << "adj_pos: ";
-                //BLT_TRACE_STREAM << adj_pos << "\n";
-                nodes[current_node].getPositionRef() = mv;
+                nodes[current_node].getPositionRef() = mouse_pos;
             }
         }
         
         void use_Eades()
         {
-            equation = std::make_unique<Eades_equation>(variables);
+            equation = std::make_unique<Eades_equation>();
         }
         
         void use_Fruchterman_Reingold()
         {
-            equation = std::make_unique<Fruchterman_Reingold_equation>(variables);
+            equation = std::make_unique<Fruchterman_Reingold_equation>();
         }
         
         void start_sim()
@@ -496,6 +296,11 @@ class graph
         std::string getSimulatorName()
         {
             return equation->name();
+        }
+        
+        auto* getSimulator()
+        {
+            return equation.get();
         }
         
         auto getCoolingFactor()
@@ -523,11 +328,6 @@ class graph
             return threshold;
         }
         
-        auto& getVariables()
-        {
-            return variables;
-        }
-        
         int& getMaxIterations()
         {
             return max_iterations;
@@ -539,171 +339,163 @@ class graph
         }
 };
 
-graph main_graph;
+class engine_t
+{
+    private:
+        graph_t graph;
+    public:
+        void init(const blt::gfx::window_data& data)
+        {
+            graph.make_new({0, 0, data.width, data.height}, 5, 25, 0.2);
+        }
+        
+        void render(const blt::gfx::window_data& data, double ft)
+        {
+            if (im::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                static int min_nodes = 5;
+                static int max_nodes = 25;
+                
+                static bounding_box bb{0, 0, data.width, data.height};
+                
+                static float connectivity = 0.12;
+                static float scaling_connectivity = 0.5;
+                static float distance_factor = 100;
+                
+                //im::SetNextItemOpen(true, ImGuiCond_Once);
+                im::Text("FPS: %lf Frame-time (ms): %lf Frame-time (S): %lf", fps, ft * 1000.0, ft);
+                im::Text("Number of Nodes: %d", graph.numberOfNodes());
+                im::SetNextItemOpen(true, ImGuiCond_Once);
+                if (im::CollapsingHeader("Help"))
+                {
+                    im::Text("You can use W/A/S/D to move the camera around");
+                    im::Text("Q/E can be used to zoom in/out the camera");
+                }
+                if (im::CollapsingHeader("Graph Generation Settings"))
+                {
+                    im::Checkbox("Screen Auto-Scale", &bb.is_screen);
+                    if (im::CollapsingHeader("Spawning Area"))
+                    {
+                        bool result = false;
+                        result |= im::InputInt("Min X", &bb.min_x, 5, 100);
+                        result |= im::InputInt("Max X", &bb.max_x, 5, 100);
+                        result |= im::InputInt("Min Y", &bb.min_y, 5, 100);
+                        result |= im::InputInt("Max Y", &bb.max_y, 5, 100);
+                        if (result)
+                            bb.is_screen = false;
+                    }
+                    if (bb.is_screen)
+                    {
+                        bb.max_x = data.width;
+                        bb.max_y = data.height;
+                        bb.min_x = 0;
+                        bb.min_y = 0;
+                    }
+                    im::SeparatorText("Node Settings");
+                    im::InputInt("Min Nodes", &min_nodes);
+                    im::InputInt("Max Nodes", &max_nodes);
+                    im::SliderFloat("Connectivity", &connectivity, 0, 1);
+                    im::SliderFloat("Scaling Connectivity", &scaling_connectivity, 0, 1);
+                    im::InputFloat("Distance Factor", &distance_factor, 5, 100);
+                    if (im::Button("Reset Graph"))
+                    {
+                        graph.reset(bb, min_nodes, max_nodes, connectivity, scaling_connectivity, distance_factor);
+                    }
+                }
+                im::SetNextItemOpen(true, ImGuiCond_Once);
+                if (im::CollapsingHeader("Simulation Settings"))
+                {
+                    im::InputInt("Max Iterations", &graph.getMaxIterations());
+                    im::Checkbox("Run Infinitely", &graph.getIterControl());
+                    im::InputInt("Sub-ticks Per Frame", &sub_ticks);
+                    im::InputFloat("Threshold", &graph.getThreshold(), 0.01, 1);
+                    graph.getSimulator()->draw_inputs_base();
+                    graph.getSimulator()->draw_inputs();
+                    im::Text("Current Cooling Factor: %f", graph.getCoolingFactor());
+                    im::SliderFloat("Simulation Speed", &graph.getSimSpeed(), 0, 4);
+                }
+                im::SetNextItemOpen(true, ImGuiCond_Once);
+                if (im::CollapsingHeader("System Controls"))
+                {
+                    if (im::Button("Start"))
+                        graph.start_sim();
+                    im::SameLine();
+                    if (im::Button("Stop"))
+                        graph.stop_sim();
+                    if (im::Button("Reset Iterations"))
+                        graph.reset_iterations();
+                    im::Text("Select a system:");
+                    auto current_sim = graph.getSimulatorName();
+                    const char* items[] = {"Eades", "Fruchterman & Reingold"};
+                    static int item_current = 0;
+                    ImGui::ListBox("##SillyBox", &item_current, items, 2, 2);
+                    
+                    if (strcmp(items[item_current], current_sim.c_str()) != 0)
+                    {
+                        switch (item_current)
+                        {
+                            case 0:
+                                graph.use_Eades();
+                                BLT_INFO("Using Eades");
+                                break;
+                            case 1:
+                                graph.use_Fruchterman_Reingold();
+                                BLT_INFO("Using Fruchterman & Reingold");
+                                break;
+                            default:
+                                BLT_WARN("This is not a valid selection! How did we get here?");
+                                break;
+                        }
+                    }
+                }
+                im::End();
+            }
+            
+            auto& io = ImGui::GetIO();
+            
+            if (!io.WantCaptureMouse && blt::gfx::isMousePressed(0))
+                graph.process_mouse_drag(data.width, data.height);
+            else
+                graph.reset_mouse_drag();
+            
+            graph.render(ft);
+        }
+};
 
-#ifdef __EMSCRIPTEN__
-std::string resource_prefix = "../";
-#else
-std::string resource_prefix = "../";
-#endif
+engine_t engine;
 
 void init(const blt::gfx::window_data& data)
 {
     using namespace blt::gfx;
-    resources.setPrefixDirectory(resource_prefix);
+    resources.setPrefixDirectory("../");
     
     resources.enqueue("res/debian.png", "debian");
     resources.enqueue("res/parker.png", "parker");
+    resources.enqueue("res/parkerpoint.png", "parker_point");
     resources.enqueue("res/parker cat ears.jpg", "parkercat");
     
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
     
-    bounding_box bb(0, 0, data.width, data.height);
-    main_graph.make_new(bb, 5, 25, 0.2);
+    engine.init(data);
+    
     lastTime = blt::system::nanoTime();
 }
-
-float x = 50, y = 50;
-float sx = 0.5, sy = 0.5;
-float ax = 0.05, ay = 0.05;
 
 void update(const blt::gfx::window_data& data)
 {
     global_matrices.update_perspectives(data.width, data.height, 90, 0.1, 2000);
     
-    x += sx;
-    y += sx;
-    
-    sx += ax;
-    sy += ay;
-    
-    if (x > 256)
-        sx *= -1;
-    if (y > 256)
-        sy *= -1;
-    
     //im::ShowDemoWindow();
-    if (im::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        static int min_nodes = 5;
-        static int max_nodes = 25;
-        
-        static bounding_box bb{0, 0, data.width, data.height};
-        
-        static float connectivity = 0.12;
-        
-        //im::SetNextItemOpen(true, ImGuiCond_Once);
-        im::Text("FPS: %lf Frame-time (ms): %lf Frame-time (S): %lf", fps, ft * 1000.0, ft);
-        im::Text("Number of Nodes: %d", main_graph.numberOfNodes());
-        im::SetNextItemOpen(true, ImGuiCond_Once);
-        if (im::CollapsingHeader("Help"))
-        {
-            im::Text("You can use W/A/S/D to move the camera around");
-            im::Text("Q/E can be used to zoom in/out the camera");
-        }
-        if (im::CollapsingHeader("Graph Generation Settings"))
-        {
-            im::Checkbox("Screen Auto-Scale", &bb.is_screen);
-            if (im::CollapsingHeader("Spawning Area"))
-            {
-                bool result = false;
-                result |= im::InputInt("Min X", &bb.min_x, 5, 100);
-                result |= im::InputInt("Max X", &bb.max_x, 5, 100);
-                result |= im::InputInt("Min Y", &bb.min_y, 5, 100);
-                result |= im::InputInt("Max Y", &bb.max_y, 5, 100);
-                if (result)
-                    bb.is_screen = false;
-            }
-            if (bb.is_screen)
-            {
-                bb.max_x = data.width;
-                bb.max_y = data.height;
-                bb.min_x = 0;
-                bb.min_y = 0;
-            }
-            im::SeparatorText("Node Settings");
-            im::InputInt("Min Nodes", &min_nodes);
-            im::InputInt("Max Nodes", &max_nodes);
-            im::SliderFloat("Connectivity", &connectivity, 0, 1);
-            if (im::Button("Reset Graph"))
-            {
-                main_graph.reset(bb, min_nodes, max_nodes, connectivity);
-            }
-        }
-        im::SetNextItemOpen(true, ImGuiCond_Once);
-        if (im::CollapsingHeader("Simulation Settings"))
-        {
-            im::InputInt("Max Iterations", &main_graph.getMaxIterations());
-            im::Checkbox("Run Infinitely", &main_graph.getIterControl());
-            im::InputInt("Sub-ticks Per Frame", &sub_ticks);
-            im::InputFloat("Threshold", &main_graph.getThreshold(), 0.01, 1);
-            im::InputFloat("Repulsive Constant", &main_graph.getVariables().repulsive_constant, 0.25, 10);
-            im::InputFloat("Spring Constant", &main_graph.getVariables().spring_constant, 0.25, 10);
-            im::InputFloat("Ideal Spring Length", &main_graph.getVariables().ideal_spring_length, 2.5, 10);
-            im::SliderFloat("Initial Temperature", &main_graph.getVariables().initial_temperature, 1, 100);
-            im::SliderFloat("Cooling Rate", &main_graph.getVariables().cooling_rate, 0, 0.999999, "%.6f");
-            im::InputFloat("Min Cooling", &main_graph.getVariables().min_cooling, 0.5, 1);
-            im::Text("Current Cooling Factor: %f", main_graph.getCoolingFactor());
-            im::SliderFloat("Simulation Speed", &main_graph.getSimSpeed(), 0, 4);
-            if (im::Button("Start"))
-                main_graph.start_sim();
-            im::SameLine();
-            if (im::Button("Stop"))
-                main_graph.stop_sim();
-            if (im::Button("Reset Iterations"))
-                main_graph.reset_iterations();
-        }
-        im::SetNextItemOpen(true, ImGuiCond_Once);
-        if (im::CollapsingHeader("System Controls"))
-        {
-            im::Text("Select a system:");
-            auto current_sim = main_graph.getSimulatorName();
-            const char* items[] = {"Eades", "Fruchterman & Reingold"};
-            static int item_current = 0;
-            ImGui::ListBox("##SillyBox", &item_current, items, 2, 2);
-            
-            if (strcmp(items[item_current], current_sim.c_str()) != 0)
-            {
-                switch (item_current)
-                {
-                    case 0:
-                        main_graph.use_Eades();
-                        BLT_INFO("Using Eades");
-                        break;
-                    case 1:
-                        main_graph.use_Fruchterman_Reingold();
-                        BLT_INFO("Using Fruchterman & Reingold");
-                        break;
-                    default:
-                        BLT_WARN("This is not a valid selection! How did we get here?");
-                        break;
-                }
-            }
-        }
-        im::End();
-    }
     
-    auto& io = ImGui::GetIO();
-    
-    if (!io.WantCaptureMouse && blt::gfx::isMousePressed(0))
-        main_graph.process_mouse_drag(data.width, data.height);
-    else
-        main_graph.reset_mouse_drag();
-    
-    main_graph.render(ft);
+    engine.render(data, ft);
     
     camera.update();
     camera.update_view(global_matrices);
     global_matrices.update();
     
-    //renderer_2d.drawPoint(blt::make_color(1, 0, 0), blt::vec2(0, 0), 50);
-    //renderer_2d.drawPoint(blt::make_color(1, 0, 0), blt::vec2(data.width, data.height), 50);
     renderer_2d.render();
-    
-    BLT_TRACE_STREAM << blt::gfx::calculateRay2D(static_cast<float>(data.width), static_cast<float>(data.height), global_matrices.getScale2D(),
-                                                 global_matrices.getView2D(), global_matrices.getOrtho()) << "\n";
     
     auto currentTime = blt::system::nanoTime();
     auto diff = currentTime - lastTime;
