@@ -27,6 +27,7 @@
 #include <blt/std/ranges.h>
 #include <blt/std/time.h>
 #include <blt/math/log_util.h>
+#include <blt/gfx/input.h>
 
 #include <graph_base.h>
 #include <force_algorithms.h>
@@ -48,10 +49,11 @@ struct bounding_box
     int min_y = 0;
     int max_x = 0;
     int max_y = 0;
-    
-    bounding_box(int min_x, int min_y, int max_x, int max_y): min_x(min_x), min_y(min_y), max_x(max_x), max_y(max_y)
-    {}
-    
+
+    bounding_box(const int min_x, const int min_y, const int max_x, const int max_y): min_x(min_x), min_y(min_y), max_x(max_x), max_y(max_y)
+    {
+    }
+
     bool is_screen = true;
 };
 
@@ -60,7 +62,7 @@ class graph_t
     private:
         std::vector<node> nodes;
         blt::hashset_t<edge, edge_hash> edges;
-        blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64>> connected_nodes;
+        blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64> > connected_nodes;
         bool sim = false;
         bool run_infinitely = true;
         float sim_speed = 1;
@@ -70,11 +72,11 @@ class graph_t
         int max_iterations = 5000;
         std::unique_ptr<force_equation> equation;
         static constexpr float POINT_SIZE = 35;
-        
+
         blt::i32 current_node = -1;
-        
-        void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity, blt::f64 scaling_connectivity,
-                                 blt::f64 distance_factor)
+
+        void create_random_graph(bounding_box bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
+                                 const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
         {
             // don't allow points too close to the edges of the window.
             if (bb.is_screen)
@@ -89,9 +91,9 @@ class graph_t
             std::uniform_int_distribution node_count_dist(min_nodes, max_nodes);
             std::uniform_real_distribution pos_x_dist(static_cast<blt::f32>(bb.min_x), static_cast<blt::f32>(bb.max_x));
             std::uniform_real_distribution pos_y_dist(static_cast<blt::f32>(bb.min_y), static_cast<blt::f32>(bb.max_y));
-            
-            auto node_count = node_count_dist(dev);
-            
+
+            const auto node_count = node_count_dist(dev);
+
             for (blt::size_t i = 0; i < node_count; i++)
             {
                 float x, y;
@@ -103,11 +105,10 @@ class graph_t
                     for (const auto& node : nodes)
                     {
                         const auto& rp = node.getRenderObj().pos;
-                        float dx = rp.x() - x;
-                        float dy = rp.y() - y;
-                        float dist = std::sqrt(dx * dx + dy * dy);
-                        
-                        if (dist <= POINT_SIZE)
+                        const float dx = rp.x() - x;
+                        const float dy = rp.y() - y;
+
+                        if (const float dist = std::sqrt(dx * dx + dy * dy); dist <= POINT_SIZE)
                         {
                             can_break = false;
                             break;
@@ -118,27 +119,26 @@ class graph_t
                 } while (true);
                 nodes.push_back(node({x, y, POINT_SIZE}));
             }
-            
-            for (const auto& node1 : blt::enumerate(nodes))
+
+            for (const auto& [index1, node1] : blt::enumerate(nodes))
             {
-                for (const auto& node2 : blt::enumerate(nodes))
+                for (const auto& [index2, node2] : blt::enumerate(nodes))
                 {
-                    if (node1.first == node2.first)
+                    if (index1 == index2)
                         continue;
-                    auto diff = node2.second.getPosition() - node1.second.getPosition();
-                    auto diff_sq = (diff * diff);
-                    auto dist = distance_factor / static_cast<float>(std::sqrt(diff_sq.x() + diff_sq.y()));
+                    const auto diff = node2.getPosition() - node1.getPosition();
+                    const auto diff_sq = (diff * diff);
+                    const auto dist = distance_factor / static_cast<float>(std::sqrt(diff_sq.x() + diff_sq.y()));
                     double dexp;
                     if (dist == 0)
                         dexp = 0;
                     else
                         dexp = 1 / (std::exp(dist) - dist);
-                    auto rand = chance(dev);
-                    if (rand <= connectivity && rand >= dexp * scaling_connectivity)
-                        connect(node1.first, node2.first);
+                    if (const auto rand = chance(dev); rand <= connectivity && rand >= dexp * scaling_connectivity)
+                        connect(index1, index2);
                 }
             }
-            
+
             std::uniform_int_distribution node_select_dist(0ul, nodes.size() - 1);
             for (blt::size_t i = 0; i < nodes.size(); i++)
             {
@@ -158,18 +158,18 @@ class graph_t
                 }
             }
         }
-    
+
     public:
         graph_t() = default;
-        
-        void make_new(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity)
+
+        void make_new(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity)
         {
             create_random_graph(bb, min_nodes, max_nodes, connectivity, 0, 25);
             use_Eades();
         }
-        
-        void reset(const bounding_box& bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity, blt::f64 scaling_connectivity,
-                   blt::f64 distance_factor)
+
+        void reset(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
+                   const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
         {
             sim = false;
             current_iterations = 0;
@@ -179,20 +179,20 @@ class graph_t
             connected_nodes.clear();
             create_random_graph(bb, min_nodes, max_nodes, connectivity, scaling_connectivity, distance_factor);
         }
-        
-        void connect(blt::u64 n1, blt::u64 n2)
+
+        void connect(const blt::u64 n1, const blt::u64 n2)
         {
             edges.insert(edge{n1, n2});
             connected_nodes[n1].insert(n2);
             connected_nodes[n2].insert(n1);
         }
-        
+
         [[nodiscard]] bool connected(blt::u64 e1, blt::u64 e2) const
         {
             return edges.contains({e1, e2});
         }
-        
-        void render(double frame_time)
+
+        void render(const double frame_time)
         {
             if (sim && (current_iterations < max_iterations || run_infinitely) && max_force_last > threshold)
             {
@@ -217,14 +217,14 @@ class graph_t
                     // update positions
                     for (auto& v : nodes)
                     {
-                        float sim_factor = static_cast<float>(frame_time * sim_speed) * 0.05f;
+                        const float sim_factor = static_cast<float>(frame_time * sim_speed) * 0.05f;
                         v.getPositionRef() += v.getVelocityRef() * equation->cooling_factor(current_iterations) * sim_factor;
                         max_force_last = std::max(max_force_last, v.getVelocityRef().magnitude());
                     }
                     current_iterations++;
                 }
             }
-            
+
             for (const auto& point : nodes)
                 renderer_2d.drawPointInternal("parker_point", point.getRenderObj(), 10.0f);
             for (const auto& edge : edges)
@@ -240,99 +240,94 @@ class graph_t
                 }
             }
         }
-        
+
         void reset_mouse_drag()
         {
             current_node = -1;
         }
-        
-        void process_mouse_drag(blt::i32 width, blt::i32 height)
+
+        void process_mouse_drag(const blt::i32 width, const blt::i32 height)
         {
-            auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
-                                                                     global_matrices.getOrtho()));
-            
+            const auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
+                                                                           global_matrices.getOrtho()));
+
             if (current_node < 0)
             {
-                
-                for (const auto& n : blt::enumerate(nodes))
+                for (const auto& [index, node] : blt::enumerate(nodes))
                 {
-                    auto pos = n.second.getPosition();
-                    
-                    auto dist = pos - mouse_pos;
-                    auto mag = dist.magnitude();
-                    
-                    if (mag < POINT_SIZE)
+                    const auto pos = node.getPosition();
+                    const auto dist = pos - mouse_pos;
+
+                    if (const auto mag = dist.magnitude(); mag < POINT_SIZE)
                     {
-                        current_node = static_cast<blt::i32>(n.first);
+                        current_node = static_cast<blt::i32>(index);
                         break;
                     }
                 }
             } else
-            {
                 nodes[current_node].getPositionRef() = mouse_pos;
-            }
         }
-        
+
         void use_Eades()
         {
             equation = std::make_unique<Eades_equation>();
         }
-        
+
         void use_Fruchterman_Reingold()
         {
             equation = std::make_unique<Fruchterman_Reingold_equation>();
         }
-        
+
         void start_sim()
         {
             sim = true;
         }
-        
+
         void stop_sim()
         {
             sim = false;
         }
-        
-        std::string getSimulatorName()
+
+        [[nodiscard]] std::string getSimulatorName() const
         {
             return equation->name();
         }
-        
-        auto* getSimulator()
+
+        [[nodiscard]] auto* getSimulator() const
         {
             return equation.get();
         }
-        
-        auto getCoolingFactor()
+
+        [[nodiscard]] auto getCoolingFactor() const
         {
             return equation->cooling_factor(current_iterations);
         }
-        
+
         void reset_iterations()
         {
             current_iterations = 0;
         }
-        
-        bool& getIterControl()
+
+        [[nodiscard]] bool& getIterControl()
         {
             return run_infinitely;
         }
-        
-        float& getSimSpeed()
+
+        [[nodiscard]] float& getSimSpeed()
         {
             return sim_speed;
         }
-        
-        float& getThreshold()
+
+        [[nodiscard]] float& getThreshold()
         {
             return threshold;
         }
-        
-        int& getMaxIterations()
+
+        [[nodiscard]] int& getMaxIterations()
         {
             return max_iterations;
         }
-        
+
         [[nodiscard]] int numberOfNodes() const
         {
             return static_cast<int>(nodes.size());
@@ -343,25 +338,20 @@ class engine_t
 {
     private:
         graph_t graph;
-    public:
-        void init(const blt::gfx::window_data& data)
-        {
-            graph.make_new({0, 0, data.width, data.height}, 5, 25, 0.2);
-        }
-        
-        void render(const blt::gfx::window_data& data, double ft)
+
+        void draw_gui(const blt::gfx::window_data& data, const double ft)
         {
             if (im::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 static int min_nodes = 5;
                 static int max_nodes = 25;
-                
+
                 static bounding_box bb{0, 0, data.width, data.height};
-                
+
                 static float connectivity = 0.12;
                 static float scaling_connectivity = 0.5;
                 static float distance_factor = 100;
-                
+
                 //im::SetNextItemOpen(true, ImGuiCond_Once);
                 im::Text("FPS: %lf Frame-time (ms): %lf Frame-time (S): %lf", fps, ft * 1000.0, ft);
                 im::Text("Number of Nodes: %d", graph.numberOfNodes());
@@ -425,11 +415,11 @@ class engine_t
                     if (im::Button("Reset Iterations"))
                         graph.reset_iterations();
                     im::Text("Select a system:");
-                    auto current_sim = graph.getSimulatorName();
+                    const auto current_sim = graph.getSimulatorName();
                     const char* items[] = {"Eades", "Fruchterman & Reingold"};
                     static int item_current = 0;
                     ImGui::ListBox("##SillyBox", &item_current, items, 2, 2);
-                    
+
                     if (strcmp(items[item_current], current_sim.c_str()) != 0)
                     {
                         switch (item_current)
@@ -450,14 +440,27 @@ class engine_t
                 }
                 im::End();
             }
-            
+        }
+
+    public:
+        void init(const blt::gfx::window_data& data)
+        {
+            graph.make_new({0, 0, data.width, data.height}, 5, 25, 0.2);
+        }
+
+        void render(const blt::gfx::window_data& data, const double ft)
+        {
+            draw_gui(data, ft);
+
             auto& io = ImGui::GetIO();
-            
+
             if (!io.WantCaptureMouse && blt::gfx::isMousePressed(0))
                 graph.process_mouse_drag(data.width, data.height);
             else
                 graph.reset_mouse_drag();
-            
+
+
+
             graph.render(ft);
         }
 };
@@ -468,37 +471,37 @@ void init(const blt::gfx::window_data& data)
 {
     using namespace blt::gfx;
     resources.setPrefixDirectory("../");
-    
+
     resources.enqueue("res/debian.png", "debian");
     resources.enqueue("res/parker.png", "parker");
     resources.enqueue("res/parkerpoint.png", "parker_point");
     resources.enqueue("res/parker cat ears.jpg", "parkercat");
-    
+
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
-    
+
     engine.init(data);
-    
+
     lastTime = blt::system::nanoTime();
 }
 
 void update(const blt::gfx::window_data& data)
 {
     global_matrices.update_perspectives(data.width, data.height, 90, 0.1, 2000);
-    
+
     //im::ShowDemoWindow();
-    
+
     engine.render(data, ft);
-    
+
     camera.update();
     camera.update_view(global_matrices);
     global_matrices.update();
-    
+
     renderer_2d.render();
-    
-    auto currentTime = blt::system::nanoTime();
-    auto diff = currentTime - lastTime;
+
+    const auto currentTime = blt::system::nanoTime();
+    const auto diff = currentTime - lastTime;
     lastTime = currentTime;
     ft = static_cast<double>(diff) / 1000000000.0;
     fps = 1 / ft;
@@ -511,6 +514,6 @@ int main(int, const char**)
     resources.cleanup();
     renderer_2d.cleanup();
     blt::gfx::cleanup();
-    
+
     return 0;
 }
