@@ -49,11 +49,11 @@ struct bounding_box
     int min_y = 0;
     int max_x = 0;
     int max_y = 0;
-
+    
     bounding_box(const int min_x, const int min_y, const int max_x, const int max_y): min_x(min_x), min_y(min_y), max_x(max_x), max_y(max_y)
     {
     }
-
+    
     bool is_screen = true;
 };
 
@@ -72,9 +72,9 @@ class graph_t
         int max_iterations = 5000;
         std::unique_ptr<force_equation> equation;
         static constexpr float POINT_SIZE = 35;
-
+        
         blt::i32 current_node = -1;
-
+        
         void create_random_graph(bounding_box bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
                                  const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
         {
@@ -91,9 +91,9 @@ class graph_t
             std::uniform_int_distribution node_count_dist(min_nodes, max_nodes);
             std::uniform_real_distribution pos_x_dist(static_cast<blt::f32>(bb.min_x), static_cast<blt::f32>(bb.max_x));
             std::uniform_real_distribution pos_y_dist(static_cast<blt::f32>(bb.min_y), static_cast<blt::f32>(bb.max_y));
-
+            
             const auto node_count = node_count_dist(dev);
-
+            
             for (blt::size_t i = 0; i < node_count; i++)
             {
                 float x, y;
@@ -107,7 +107,7 @@ class graph_t
                         const auto& rp = node.getRenderObj().pos;
                         const float dx = rp.x() - x;
                         const float dy = rp.y() - y;
-
+                        
                         if (const float dist = std::sqrt(dx * dx + dy * dy); dist <= POINT_SIZE)
                         {
                             can_break = false;
@@ -119,7 +119,7 @@ class graph_t
                 } while (true);
                 nodes.push_back(node({x, y, POINT_SIZE}));
             }
-
+            
             for (const auto& [index1, node1] : blt::enumerate(nodes))
             {
                 for (const auto& [index2, node2] : blt::enumerate(nodes))
@@ -138,7 +138,7 @@ class graph_t
                         connect(index1, index2);
                 }
             }
-
+            
             std::uniform_int_distribution node_select_dist(0ul, nodes.size() - 1);
             for (blt::size_t i = 0; i < nodes.size(); i++)
             {
@@ -158,16 +158,16 @@ class graph_t
                 }
             }
         }
-
+    
     public:
         graph_t() = default;
-
+        
         void make_new(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity)
         {
             create_random_graph(bb, min_nodes, max_nodes, connectivity, 0, 25);
             use_Eades();
         }
-
+        
         void reset(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
                    const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
         {
@@ -179,19 +179,19 @@ class graph_t
             connected_nodes.clear();
             create_random_graph(bb, min_nodes, max_nodes, connectivity, scaling_connectivity, distance_factor);
         }
-
+        
         void connect(const blt::u64 n1, const blt::u64 n2)
         {
             edges.insert(edge{n1, n2});
             connected_nodes[n1].insert(n2);
             connected_nodes[n2].insert(n1);
         }
-
+        
         [[nodiscard]] bool connected(blt::u64 e1, blt::u64 e2) const
         {
             return edges.contains({e1, e2});
         }
-
+        
         void render(const double frame_time)
         {
             if (sim && (current_iterations < max_iterations || run_infinitely) && max_force_last > threshold)
@@ -224,9 +224,12 @@ class graph_t
                     current_iterations++;
                 }
             }
-
+            
             for (const auto& point : nodes)
-                renderer_2d.drawPointInternal("parker_point", point.getRenderObj(), 10.0f);
+            {
+                auto draw_info = blt::gfx::render_info_t::make_info("parker_point", blt::make_color(1, 1, 1));
+                renderer_2d.drawPointInternal(draw_info, point.getRenderObj(), 10.0f);
+            }
             for (const auto& edge : edges)
             {
                 if (edge.getFirst() >= nodes.size() || edge.getSecond() >= nodes.size())
@@ -240,24 +243,24 @@ class graph_t
                 }
             }
         }
-
+        
         void reset_mouse_drag()
         {
             current_node = -1;
         }
-
+        
         void process_mouse_drag(const blt::i32 width, const blt::i32 height)
         {
             const auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
                                                                            global_matrices.getOrtho()));
-
+            
             if (current_node < 0)
             {
                 for (const auto& [index, node] : blt::enumerate(nodes))
                 {
                     const auto pos = node.getPosition();
                     const auto dist = pos - mouse_pos;
-
+                    
                     if (const auto mag = dist.magnitude(); mag < POINT_SIZE)
                     {
                         current_node = static_cast<blt::i32>(index);
@@ -267,67 +270,67 @@ class graph_t
             } else
                 nodes[current_node].getPositionRef() = mouse_pos;
         }
-
+        
         void use_Eades()
         {
             equation = std::make_unique<Eades_equation>();
         }
-
+        
         void use_Fruchterman_Reingold()
         {
             equation = std::make_unique<Fruchterman_Reingold_equation>();
         }
-
+        
         void start_sim()
         {
             sim = true;
         }
-
+        
         void stop_sim()
         {
             sim = false;
         }
-
+        
         [[nodiscard]] std::string getSimulatorName() const
         {
             return equation->name();
         }
-
+        
         [[nodiscard]] auto* getSimulator() const
         {
             return equation.get();
         }
-
+        
         [[nodiscard]] auto getCoolingFactor() const
         {
             return equation->cooling_factor(current_iterations);
         }
-
+        
         void reset_iterations()
         {
             current_iterations = 0;
         }
-
+        
         [[nodiscard]] bool& getIterControl()
         {
             return run_infinitely;
         }
-
+        
         [[nodiscard]] float& getSimSpeed()
         {
             return sim_speed;
         }
-
+        
         [[nodiscard]] float& getThreshold()
         {
             return threshold;
         }
-
+        
         [[nodiscard]] int& getMaxIterations()
         {
             return max_iterations;
         }
-
+        
         [[nodiscard]] int numberOfNodes() const
         {
             return static_cast<int>(nodes.size());
@@ -338,20 +341,20 @@ class engine_t
 {
     private:
         graph_t graph;
-
+        
         void draw_gui(const blt::gfx::window_data& data, const double ft)
         {
             if (im::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 static int min_nodes = 5;
                 static int max_nodes = 25;
-
+                
                 static bounding_box bb{0, 0, data.width, data.height};
-
+                
                 static float connectivity = 0.12;
                 static float scaling_connectivity = 0.5;
                 static float distance_factor = 100;
-
+                
                 //im::SetNextItemOpen(true, ImGuiCond_Once);
                 im::Text("FPS: %lf Frame-time (ms): %lf Frame-time (S): %lf", fps, ft * 1000.0, ft);
                 im::Text("Number of Nodes: %d", graph.numberOfNodes());
@@ -419,7 +422,7 @@ class engine_t
                     const char* items[] = {"Eades", "Fruchterman & Reingold"};
                     static int item_current = 0;
                     ImGui::ListBox("##SillyBox", &item_current, items, 2, 2);
-
+                    
                     if (strcmp(items[item_current], current_sim.c_str()) != 0)
                     {
                         switch (item_current)
@@ -441,26 +444,25 @@ class engine_t
                 im::End();
             }
         }
-
+    
     public:
         void init(const blt::gfx::window_data& data)
         {
             graph.make_new({0, 0, data.width, data.height}, 5, 25, 0.2);
         }
-
+        
         void render(const blt::gfx::window_data& data, const double ft)
         {
             draw_gui(data, ft);
-
+            
             auto& io = ImGui::GetIO();
-
+            
             if (!io.WantCaptureMouse && blt::gfx::isMousePressed(0))
                 graph.process_mouse_drag(data.width, data.height);
             else
                 graph.reset_mouse_drag();
-
-
-
+            
+            
             graph.render(ft);
         }
 };
@@ -471,35 +473,35 @@ void init(const blt::gfx::window_data& data)
 {
     using namespace blt::gfx;
     resources.setPrefixDirectory("../");
-
+    
     resources.enqueue("res/debian.png", "debian");
     resources.enqueue("res/parker.png", "parker");
     resources.enqueue("res/parkerpoint.png", "parker_point");
     resources.enqueue("res/parker cat ears.jpg", "parkercat");
-
+    
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
-
+    
     engine.init(data);
-
+    
     lastTime = blt::system::nanoTime();
 }
 
 void update(const blt::gfx::window_data& data)
 {
     global_matrices.update_perspectives(data.width, data.height, 90, 0.1, 2000);
-
+    
     //im::ShowDemoWindow();
-
+    
     engine.render(data, ft);
-
+    
     camera.update();
     camera.update_view(global_matrices);
     global_matrices.update();
-
-    renderer_2d.render();
-
+    
+    renderer_2d.render(data.width, data.height);
+    
     const auto currentTime = blt::system::nanoTime();
     const auto diff = currentTime - lastTime;
     lastTime = currentTime;
@@ -509,11 +511,11 @@ void update(const blt::gfx::window_data& data)
 
 int main(int, const char**)
 {
-    blt::gfx::init(blt::gfx::window_data{"My Sexy Window", init, update, 1440, 720}.setSyncInterval(1));
+    blt::gfx::init(blt::gfx::window_data{"Graphing Lovers United", init, update, 1440, 720}.setSyncInterval(1));
     global_matrices.cleanup();
     resources.cleanup();
     renderer_2d.cleanup();
     blt::gfx::cleanup();
-
+    
     return 0;
 }
