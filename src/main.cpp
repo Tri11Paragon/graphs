@@ -34,7 +34,7 @@
 
 blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
-blt::gfx::batch_renderer_2d renderer_2d(resources);
+blt::gfx::batch_renderer_2d renderer_2d(resources, global_matrices);
 blt::gfx::first_person_camera_2d camera;
 blt::u64 lastTime;
 double ft = 0;
@@ -227,7 +227,7 @@ class graph_t
             
             for (const auto& point : nodes)
             {
-                auto draw_info = blt::gfx::render_info_t::make_info("parker_point", blt::make_color(1, 1, 1));
+                auto draw_info = blt::gfx::render_info_t::make_info("parker_point", blt::make_color(0, 1, 1));
                 renderer_2d.drawPointInternal(draw_info, point.getRenderObj(), 10.0f);
             }
             for (const auto& edge : edges)
@@ -239,7 +239,8 @@ class graph_t
                 {
                     auto n1 = nodes[edge.getFirst()];
                     auto n2 = nodes[edge.getSecond()];
-                    renderer_2d.drawLine(blt::make_color(0, 1, 0), 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, 2.0f);
+                    auto draw_info = blt::gfx::render_info_t::make_info(blt::make_color(0, 1, 0), blt::make_color(1, 0, 0));
+                    renderer_2d.drawLine(draw_info, 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, 2.0f);
                 }
             }
         }
