@@ -28,9 +28,10 @@
 #include <blt/std/time.h>
 #include <blt/math/log_util.h>
 #include <blt/gfx/input.h>
-
+#include <blt/parse/templating.h>
 #include <graph_base.h>
 #include <force_algorithms.h>
+#include <blt/gfx/renderer/shaders/pp_screen.frag>
 
 blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
@@ -510,8 +511,47 @@ void update(const blt::gfx::window_data& data)
     fps = 1 / ft;
 }
 
+void process_string(const std::string& str)
+{
+    BLT_DEBUG(str);
+    auto results = blt::template_engine_t::process_string(str);
+    if (results)
+    {
+        auto val = results.value();
+        for (auto& v : val)
+        {
+            BLT_TRACE_STREAM << (blt::template_token_to_string(v.type));
+        }
+        BLT_TRACE_STREAM << "\n";
+        for (auto& v : val)
+        {
+            BLT_TRACE("{%s: %s}", blt::template_token_to_string(v.type).c_str(), std::string(v.token).c_str());
+        }
+    } else
+    {
+        auto error = results.error();
+        switch (error)
+        {
+            case blt::template_tokenizer_failure_t::MISMATCHED_CURLY:
+                BLT_ERROR("Tokenizer Failure: Mismatched curly");
+                break;
+            case blt::template_tokenizer_failure_t::MISMATCHED_PAREN:
+                BLT_ERROR("Tokenizer Failure: Mismatched parenthesis");
+                break;
+            case blt::template_tokenizer_failure_t::MISMATCHED_QUOTE:
+                BLT_ERROR("Tokenizer Failure: Mismatched Quotes");
+                break;
+        }
+        
+    }
+    BLT_DEBUG("--------------------------");
+}
+
 int main(int, const char**)
 {
+    blt::template_engine_t templateEngine;
+    
+    return 0;
     blt::gfx::init(blt::gfx::window_data{"Graphing Lovers United", init, update, 1440, 720}.setSyncInterval(1));
     global_matrices.cleanup();
     resources.cleanup();
