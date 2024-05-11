@@ -550,8 +550,8 @@ void process_string(const std::string& str)
 int main(int, const char**)
 {
     blt::template_engine_t templateEngine;
-    templateEngine.set("LAYOUT_STRING", "layout (location = ${IF(LAYOUT_LOCATION) LAYOUT_LOCATION ELSE ~DISCARD})");
-    templateEngine.set("LAYOUT_LOCATION", "0");
+    templateEngine.set("LAYOUT_STRING", "layout (location = ${IF(LAYOUT_LOCATION) { LAYOUT_LOCATION } ELSE { ~DISCARD }}) ");
+    templateEngine.set("LAYOUT_LOCATION", "1");
     
     auto result = templateEngine.evaluate(shader_pp_screen_frag);
     
