@@ -38,6 +38,8 @@ void force_equation::draw_inputs_base()
 {
     namespace im = ImGui;
     im::InputFloat("Ideal Spring Length", &ideal_spring_length, 2.5, 10);
+    if (ideal_spring_length < 1)
+        ideal_spring_length = 1;
     im::SliderFloat("Initial Temperature", &initial_temperature, 1, 100);
     im::SliderFloat("Cooling Rate", &cooling_rate, 0, 0.999999, "%.6f");
     im::InputFloat("Min Cooling", &min_cooling, 0.5, 1);

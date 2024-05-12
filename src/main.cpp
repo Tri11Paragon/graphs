@@ -549,18 +549,18 @@ void process_string(const std::string& str)
 
 int main(int, const char**)
 {
-    blt::template_engine_t templateEngine;
-    templateEngine.set("LAYOUT_STRING", "layout (location = ${IF(LAYOUT_LOCATION) { LAYOUT_LOCATION } ELSE { ~DISCARD }}) ");
-    templateEngine.set("LAYOUT_LOCATION", "1");
-    
-    auto result = templateEngine.evaluate(shader_pp_screen_frag);
-    
-    if (result)
-        BLT_TRACE(result.value());
-    else
-        BLT_TRACE("Function Failed: %d", static_cast<int>(result.error()));
-    
-    return 0;
+//    blt::template_engine_t templateEngine;
+//    templateEngine.set("LAYOUT_STRING", "layout (location = ${IF(LAYOUT_LOCATION) { LAYOUT_LOCATION } ELSE { ~DISCARD }}) ");
+//    templateEngine.set("LAYOUT_LOCATION", "1");
+//
+//    auto result = templateEngine.evaluate(shader_pp_screen_frag);
+//
+//    if (result)
+//        BLT_TRACE(result.value());
+//    else
+//        BLT_TRACE("Function Failed: %d", static_cast<int>(result.error()));
+//
+//    return 0;
     blt::gfx::init(blt::gfx::window_data{"Graphing Lovers United", init, update, 1440, 720}.setSyncInterval(1));
     global_matrices.cleanup();
     resources.cleanup();
