@@ -27,7 +27,9 @@ class node
 {
     private:
         blt::gfx::point2d_t point;
+        float outline_scale = 1.25f;
         blt::vec2 velocity;
+        blt::color4 outline_color = blt::make_color(0.0, 1.0, 1.0);
     public:
         explicit node(const blt::gfx::point2d_t& point): point(point)
         {}
@@ -51,6 +53,26 @@ class node
         {
             return point;
         }
+        
+        [[nodiscard]] float getOutlineScale() const
+        {
+            return outline_scale;
+        }
+        
+        void setOutlineScale(float outlineScale)
+        {
+            outline_scale = outlineScale;
+        }
+        
+        [[nodiscard]] const blt::color4& getOutlineColor() const
+        {
+            return outline_color;
+        }
+        
+        void setOutlineColor(const blt::color4& c)
+        {
+            outline_color = c;
+        }
 };
 
 
@@ -58,6 +80,10 @@ class edge
 {
     private:
         blt::u64 i1, i2;
+        float outline_scale = 2.0f;
+        float thickness = 2.0f;
+        blt::color4 color = blt::make_color(0, 1, 0);
+        blt::color4 outline_color = blt::make_color(1, 0, 0);
     public:
         edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
@@ -77,6 +103,46 @@ class edge
         [[nodiscard]] size_t getSecond() const
         {
             return i2;
+        }
+        
+        [[nodiscard]] float getOutlineScale() const
+        {
+            return outline_scale;
+        }
+        
+        void setOutlineScale(float outlineScale)
+        {
+            outline_scale = outlineScale;
+        }
+        
+        [[nodiscard]] const blt::color4& getColor() const
+        {
+            return color;
+        }
+        
+        void setColor(const blt::color4& c)
+        {
+            color = c;
+        }
+        
+        [[nodiscard]] const blt::color4& getOutlineColor() const
+        {
+            return outline_color;
+        }
+        
+        void setOutlineColor(const blt::color4& outlineColor)
+        {
+            outline_color = outlineColor;
+        }
+        
+        [[nodiscard]] float getThickness() const
+        {
+            return thickness;
+        }
+        
+        void setThickness(float t)
+        {
+            thickness = t;
         }
 };
 

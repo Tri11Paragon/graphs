@@ -228,8 +228,10 @@ class graph_t
             
             for (const auto& point : nodes)
             {
-                auto draw_info = blt::gfx::render_info_t::make_info("parker_point", blt::make_color(0, 1, 1));
-                renderer_2d.drawPointInternal(draw_info, point.getRenderObj(), 10.0f);
+                auto pr = point.getRenderObj();
+                pr.scale *= point.getOutlineScale();
+                renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info(point.getOutlineColor()), pr, 10.0f);
+                renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info("parker_point"), point.getRenderObj(), 15.0f);
             }
             for (const auto& edge : edges)
             {
@@ -240,8 +242,11 @@ class graph_t
                 {
                     auto n1 = nodes[edge.getFirst()];
                     auto n2 = nodes[edge.getSecond()];
-                    auto draw_info = blt::gfx::render_info_t::make_info(blt::make_color(0, 1, 0), blt::make_color(1, 0, 0));
-                    renderer_2d.drawLine(draw_info, 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, 2.0f);
+                    auto draw_info = blt::gfx::render_info_t::make_info(edge.getColor());
+                    auto outline_info = blt::gfx::render_info_t::make_info(edge.getOutlineColor());
+                    blt::gfx::line2d_t line{n1.getRenderObj().pos, n2.getRenderObj().pos, edge.getThickness() * edge.getOutlineScale()};
+                    renderer_2d.drawLine(draw_info, 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, edge.getThickness());
+                    renderer_2d.drawLineInternal(outline_info, line, 2.0f);
                 }
             }
         }
@@ -511,56 +516,8 @@ void update(const blt::gfx::window_data& data)
     fps = 1 / ft;
 }
 
-void process_string(const std::string& str)
-{
-    BLT_DEBUG(str);
-    auto results = blt::template_engine_t::process_string(str);
-    if (results)
-    {
-        auto val = results.value();
-        for (auto& v : val)
-        {
-            BLT_TRACE_STREAM << (blt::template_token_to_string(v.type));
-        }
-        BLT_TRACE_STREAM << "\n";
-        for (auto& v : val)
-        {
-            BLT_TRACE("{%s: %s}", blt::template_token_to_string(v.type).c_str(), std::string(v.token).c_str());
-        }
-    } else
-    {
-        auto error = results.error();
-        switch (error)
-        {
-            case blt::template_tokenizer_failure_t::MISMATCHED_CURLY:
-                BLT_ERROR("Tokenizer Failure: Mismatched curly");
-                break;
-            case blt::template_tokenizer_failure_t::MISMATCHED_PAREN:
-                BLT_ERROR("Tokenizer Failure: Mismatched parenthesis");
-                break;
-            case blt::template_tokenizer_failure_t::MISMATCHED_QUOTE:
-                BLT_ERROR("Tokenizer Failure: Mismatched Quotes");
-                break;
-        }
-        
-    }
-    BLT_DEBUG("--------------------------");
-}
-
 int main(int, const char**)
 {
-//    blt::template_engine_t templateEngine;
-//    templateEngine.set("LAYOUT_STRING", "layout (location = ${IF(LAYOUT_LOCATION) { LAYOUT_LOCATION } ELSE { ~DISCARD }}) ");
-//    templateEngine.set("LAYOUT_LOCATION", "1");
-//
-//    auto result = templateEngine.evaluate(shader_pp_screen_frag);
-//
-//    if (result)
-//        BLT_TRACE(result.value());
-//    else
-//        BLT_TRACE("Function Failed: %d", static_cast<int>(result.error()));
-//
-//    return 0;
     blt::gfx::init(blt::gfx::window_data{"Graphing Lovers United", init, update, 1440, 720}.setSyncInterval(1));
     global_matrices.cleanup();
     resources.cleanup();
