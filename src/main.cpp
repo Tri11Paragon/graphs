@@ -227,12 +227,8 @@ class graph_t
             }
             
             for (const auto& point : nodes)
-            {
-                auto pr = point.getRenderObj();
-                pr.scale *= point.getOutlineScale();
-                renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info(point.getOutlineColor()), pr, 10.0f);
-                renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info("parker_point"), point.getRenderObj(), 15.0f);
-            }
+                renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info("parker_point", point.getOutlineColor(), point.getOutlineScale()),
+                                              point.getRenderObj(), 15.0f);
             for (const auto& edge : edges)
             {
                 if (edge.getFirst() >= nodes.size() || edge.getSecond() >= nodes.size())
