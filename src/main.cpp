@@ -238,11 +238,8 @@ class graph_t
                 {
                     auto n1 = nodes[edge.getFirst()];
                     auto n2 = nodes[edge.getSecond()];
-                    auto draw_info = blt::gfx::render_info_t::make_info(edge.getColor());
-                    auto outline_info = blt::gfx::render_info_t::make_info(edge.getOutlineColor());
-                    blt::gfx::line2d_t line{n1.getRenderObj().pos, n2.getRenderObj().pos, edge.getThickness() * edge.getOutlineScale()};
+                    auto draw_info = blt::gfx::render_info_t::make_info(edge.getColor(), edge.getOutlineColor(), edge.getOutlineScale());
                     renderer_2d.drawLine(draw_info, 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, edge.getThickness());
-                    renderer_2d.drawLineInternal(outline_info, line, 2.0f);
                 }
             }
         }
