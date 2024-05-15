@@ -19,25 +19,15 @@
 #include "blt/gfx/renderer/resource_manager.h"
 #include "blt/gfx/renderer/batch_2d_renderer.h"
 #include "blt/gfx/renderer/camera.h"
-#include <blt/gfx/framebuffer.h>
 #include <blt/gfx/raycast.h>
-#include <imgui.h>
-#include <memory>
-#include <random>
-#include <blt/std/ranges.h>
 #include <blt/std/time.h>
 #include <blt/math/log_util.h>
-#include <blt/gfx/input.h>
-#include <blt/parse/templating.h>
 #include <graph.h>
-#include <blt/gfx/renderer/shaders/pp_screen.frag>
 
 blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
 blt::gfx::batch_renderer_2d renderer_2d(resources, global_matrices);
 blt::gfx::first_person_camera_2d camera;
-blt::u64 lastTime;
-double ft = 0;
 
 namespace im = ImGui;
 
@@ -58,8 +48,6 @@ void init(const blt::gfx::window_data& data)
     renderer_2d.create();
     
     engine.init(data);
-    
-    lastTime = blt::system::nanoTime();
 }
 
 void update(const blt::gfx::window_data& data)
@@ -68,18 +56,13 @@ void update(const blt::gfx::window_data& data)
     
     //im::ShowDemoWindow();
     
-    engine.render(data, ft);
+    engine.render(data);
     
     camera.update();
     camera.update_view(global_matrices);
     global_matrices.update();
     
     renderer_2d.render(data.width, data.height);
-    
-    const auto currentTime = blt::system::nanoTime();
-    const auto diff = currentTime - lastTime;
-    lastTime = currentTime;
-    ft = static_cast<double>(diff) / 1000000000.0;
 }
 
 int main(int, const char**)

@@ -22,6 +22,7 @@
 #include <graph_base.h>
 #include <force_algorithms.h>
 #include <blt/gfx/window.h>
+#include <blt/math/interpolation.h>
 
 namespace im = ImGui;
 
@@ -55,7 +56,8 @@ class graph_t
         std::unique_ptr<force_equation> equation;
         static constexpr float POINT_SIZE = 35;
         
-        blt::i32 current_node = -1;
+        blt::i32 selected_node = -1;
+        blt::quint_easing easing;
         
         void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity,
                                  blt::f64 scaling_connectivity, blt::f64 distance_factor);
@@ -93,14 +95,18 @@ class graph_t
             return edges.contains({e1, e2});
         }
         
-        void render(double frame_time);
+        void render();
         
         void reset_mouse_drag()
         {
-            current_node = -1;
+            easing.reset();
+            nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+            selected_node = -1;
         }
         
         void process_mouse_drag(blt::i32 width, blt::i32 height);
+        
+        void handle_mouse();
         
         void use_Eades()
         {
@@ -173,7 +179,7 @@ class engine_t
     private:
         graph_t graph;
         
-        void draw_gui(const blt::gfx::window_data& data, double ft);
+        void draw_gui(const blt::gfx::window_data& data);
     
     public:
         void init(const blt::gfx::window_data& data)
@@ -181,19 +187,21 @@ class engine_t
             graph.make_new({0, 0, data.width, data.height}, 5, 25, 0.2);
         }
         
-        void render(const blt::gfx::window_data& data, const double ft)
+        void render(const blt::gfx::window_data& data)
         {
-            draw_gui(data, ft);
+            draw_gui(data);
             
             auto& io = ImGui::GetIO();
             
-            if (!io.WantCaptureMouse && blt::gfx::isMousePressed(0))
-                graph.process_mouse_drag(data.width, data.height);
-            else
-                graph.reset_mouse_drag();
+            if (!io.WantCaptureMouse){
+                if (blt::gfx::isMousePressed(0))
+                    graph.process_mouse_drag(data.width, data.height);
+                else
+                    graph.reset_mouse_drag();
+            }
             
             
-            graph.render(ft);
+            graph.render();
         }
 };
 

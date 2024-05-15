@@ -19,14 +19,17 @@
 #include <random>
 #include <blt/gfx/raycast.h>
 #include <blt/std/ranges.h>
+#include <blt/math/interpolation.h>
+#include <color_constants.h>
 
 extern blt::gfx::batch_renderer_2d renderer_2d;
 extern blt::gfx::matrix_state_manager global_matrices;
 
 int sub_ticks = 1;
 
-void graph_t::render(const double frame_time)
+void graph_t::render()
 {
+    const double frame_time = blt::gfx::getFrameDeltaSeconds();
     if (sim && (current_iterations < max_iterations || run_infinitely) && max_force_last > threshold)
     {
         for (int _ = 0; _ < sub_ticks; _++)
@@ -81,7 +84,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
     const auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
                                                                    global_matrices.getOrtho()));
     
-    if (current_node < 0)
+    if (selected_node < 0)
     {
         for (const auto& [index, node] : blt::enumerate(nodes))
         {
@@ -90,12 +93,25 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
             
             if (const auto mag = dist.magnitude(); mag < POINT_SIZE)
             {
-                current_node = static_cast<blt::i32>(index);
+                selected_node = static_cast<blt::i32>(index);
                 break;
             }
         }
     } else
-        nodes[current_node].getPositionRef() = mouse_pos;
+    {
+        auto& node = nodes[selected_node];
+        easing.progress(5 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
+        node.setOutlineColor(easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_SELECT_COLOR));
+        node.getPositionRef() = mouse_pos;
+    }
+}
+
+void graph_t::handle_mouse()
+{
+    for (const auto& node : nodes)
+    {
+    
+    }
 }
 
 void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
@@ -182,8 +198,9 @@ void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, 
     }
 }
 
-void engine_t::draw_gui(const blt::gfx::window_data& data, const double ft)
+void engine_t::draw_gui(const blt::gfx::window_data& data)
 {
+    double ft = blt::gfx::getFrameDeltaSeconds();
     if (im::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
         static int min_nodes = 5;

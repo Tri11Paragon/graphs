@@ -22,6 +22,8 @@
 #include <blt/gfx/renderer/batch_2d_renderer.h>
 #include <blt/std/types.h>
 #include <blt/std/assert.h>
+#include <color_constants.h>
+
 
 class node
 {
@@ -29,7 +31,7 @@ class node
         blt::gfx::point2d_t point;
         float outline_scale = 1.25f;
         blt::vec2 velocity;
-        blt::color4 outline_color = blt::make_color(0.0, 1.0, 1.0);
+        blt::color4 outline_color = color::POINT_OUTLINE_COLOR;
     public:
         explicit node(const blt::gfx::point2d_t& point): point(point)
         {}
@@ -82,8 +84,8 @@ class edge
         blt::u64 i1, i2;
         float outline_scale = 2.0f;
         float thickness = 2.0f;
-        blt::color4 color = blt::make_color(0, 1, 0);
-        blt::color4 outline_color = blt::make_color(1, 0, 0);
+        blt::color4 color = color::EDGE_COLOR;
+        blt::color4 outline_color = color::EDGE_OUTLINE_COLOR;
     public:
         edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
