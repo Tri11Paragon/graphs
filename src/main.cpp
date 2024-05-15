@@ -31,6 +31,16 @@ blt::gfx::first_person_camera_2d camera;
 
 namespace im = ImGui;
 
+/*
+ * TODO:
+ *  - Highlighted Node
+ *      + transitions to other states
+ *  - Selected Node
+ *  - ability to add nodes to the graph
+ *  - ability to add edges to the graph
+ *  - ability to remove edges from the graph (multi selection?)
+ *  - ability to remove nodes from graph (make use of multi selection?)
+ */
 engine_t engine;
 
 void init(const blt::gfx::window_data& data)

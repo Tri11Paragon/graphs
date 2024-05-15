@@ -86,7 +86,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
                                                                    global_matrices.getOrtho()));
     
     bool mouse_pressed = blt::gfx::isMousePressed(0);
-    blt::i32 new_selection = selected_node;
+    blt::i32 new_selection = -1;
     
     for (const auto& [index, node] : blt::enumerate(nodes))
     {
@@ -95,7 +95,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
         
         const auto mag = dist.magnitude();
         
-        if (mag < POINT_SIZE && (selected_node == -1 || !mouse_pressed))
+        if (mag < POINT_SIZE && mouse_pressed)
         {
             new_selection = static_cast<blt::i32>(index);
             break;
@@ -108,21 +108,17 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
             nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
     }
     
-    if (!mouse_pressed && blt::gfx::mouseReleaseLastFrame())
+    if (mouse_pressed && new_selection == -1 && selected_node != -1)
     {
-        reset_mouse_drag();
+        selected_node = -1;
     }
     
     selected_node = new_selection;
     
-//    if (!mouse_pressed && selected_node != -1 && found && nodes[selected_node].getOutlineColor() != color::POINT_HIGHLIGHT_COLOR)
-//    {
-//        highlight_easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-//        nodes[selected_node].setOutlineColor(highlight_easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_HIGHLIGHT_COLOR));
-//    }
-//
-//    if (!found)
-//        reset_mouse_highlight();
+    if (!mouse_pressed && blt::gfx::mouseReleaseLastFrame())
+    {
+        reset_mouse_drag();
+    }
     
     if (selected_node != -1 && mouse_pressed)
     {
@@ -134,12 +130,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
 }
 
 void graph_t::handle_mouse()
-{
-    for (const auto& node : nodes)
-    {
-    
-    }
-}
+{}
 
 void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
                                   const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
