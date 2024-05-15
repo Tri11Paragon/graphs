@@ -26,6 +26,14 @@
 
 namespace im = ImGui;
 
+enum class anim_state_t
+{
+    NONE,
+    HIGHLIGHT_NODE,
+    SELECT_NODE,
+    HIGHLIGHT_TO_SELECT
+};
+
 struct bounding_box
 {
     int min_x = 0;
@@ -57,7 +65,6 @@ class graph_t
         static constexpr float POINT_SIZE = 35;
         
         blt::i32 selected_node = -1;
-        blt::i32 highlighted_node = -1;
         blt::quad_easing easing;
         blt::quint_easing highlight_easing;
         
@@ -111,9 +118,6 @@ class graph_t
         
         void reset_mouse_highlight()
         {
-            if (highlighted_node != -1)
-                nodes[highlighted_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
-            highlighted_node = -1;
             highlight_easing.reset();
         }
         

@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <blt/gfx/window.h>
 #include <graph.h>
 #include <random>
 #include <blt/gfx/raycast.h>
@@ -85,45 +86,50 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
                                                                    global_matrices.getOrtho()));
     
     bool mouse_pressed = blt::gfx::isMousePressed(0);
+    blt::i32 new_selection = selected_node;
     
-    if (selected_node < 0)
+    for (const auto& [index, node] : blt::enumerate(nodes))
     {
-        for (const auto& [index, node] : blt::enumerate(nodes))
+        const auto pos = node.getPosition();
+        const auto dist = pos - mouse_pos;
+        
+        const auto mag = dist.magnitude();
+        
+        if (mag < POINT_SIZE && (selected_node == -1 || !mouse_pressed))
         {
-            const auto pos = node.getPosition();
-            const auto dist = pos - mouse_pos;
-            
-            const auto mag = dist.magnitude();
-            
-            if (mag < POINT_SIZE && mouse_pressed)
-            {
-                selected_node = static_cast<blt::i32>(index);
-                reset_mouse_highlight();
-                break;
-            } else if (mag < POINT_SIZE * (node.getOutlineScale() + (node.getOutlineScale() - 1) * 2))
-            {
-                highlighted_node = static_cast<blt::i32>(index);
-            }
+            new_selection = static_cast<blt::i32>(index);
+            break;
         }
-    } else
+    }
+    
+    if (new_selection != selected_node)
+    {
+        if (selected_node != -1)
+            nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+    }
+    
+    if (!mouse_pressed && blt::gfx::mouseReleaseLastFrame())
+    {
+        reset_mouse_drag();
+    }
+    
+    selected_node = new_selection;
+    
+//    if (!mouse_pressed && selected_node != -1 && found && nodes[selected_node].getOutlineColor() != color::POINT_HIGHLIGHT_COLOR)
+//    {
+//        highlight_easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
+//        nodes[selected_node].setOutlineColor(highlight_easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_HIGHLIGHT_COLOR));
+//    }
+//
+//    if (!found)
+//        reset_mouse_highlight();
+    
+    if (selected_node != -1 && mouse_pressed)
     {
         auto& node = nodes[selected_node];
         easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-        node.setOutlineColor(easing.apply(color::POINT_HIGHLIGHT_COLOR, color::POINT_SELECT_COLOR));
+        node.setOutlineColor(easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_SELECT_COLOR));
         node.getPositionRef() = mouse_pos;
-    }
-    
-    if (highlighted_node != -1)
-    {
-        highlight_easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-        BLT_TRACE("Hmew");
-        nodes[highlighted_node].setOutlineColor(highlight_easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_HIGHLIGHT_COLOR));
-    } else
-        reset_mouse_highlight();
-    
-    if (!mouse_pressed)
-    {
-        reset_mouse_drag();
     }
 }
 
