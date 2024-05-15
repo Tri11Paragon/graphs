@@ -84,6 +84,8 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
     const auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
                                                                    global_matrices.getOrtho()));
     
+    bool mouse_pressed = blt::gfx::isMousePressed(0);
+    
     if (selected_node < 0)
     {
         for (const auto& [index, node] : blt::enumerate(nodes))
@@ -91,18 +93,37 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
             const auto pos = node.getPosition();
             const auto dist = pos - mouse_pos;
             
-            if (const auto mag = dist.magnitude(); mag < POINT_SIZE)
+            const auto mag = dist.magnitude();
+            
+            if (mag < POINT_SIZE && mouse_pressed)
             {
                 selected_node = static_cast<blt::i32>(index);
+                reset_mouse_highlight();
                 break;
+            } else if (mag < POINT_SIZE * (node.getOutlineScale() + (node.getOutlineScale() - 1) * 2))
+            {
+                highlighted_node = static_cast<blt::i32>(index);
             }
         }
     } else
     {
         auto& node = nodes[selected_node];
-        easing.progress(5 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-        node.setOutlineColor(easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_SELECT_COLOR));
+        easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
+        node.setOutlineColor(easing.apply(color::POINT_HIGHLIGHT_COLOR, color::POINT_SELECT_COLOR));
         node.getPositionRef() = mouse_pos;
+    }
+    
+    if (highlighted_node != -1)
+    {
+        highlight_easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
+        BLT_TRACE("Hmew");
+        nodes[highlighted_node].setOutlineColor(highlight_easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_HIGHLIGHT_COLOR));
+    } else
+        reset_mouse_highlight();
+    
+    if (!mouse_pressed)
+    {
+        reset_mouse_drag();
     }
 }
 

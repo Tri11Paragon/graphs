@@ -57,7 +57,9 @@ class graph_t
         static constexpr float POINT_SIZE = 35;
         
         blt::i32 selected_node = -1;
-        blt::quint_easing easing;
+        blt::i32 highlighted_node = -1;
+        blt::quad_easing easing;
+        blt::quint_easing highlight_easing;
         
         void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity,
                                  blt::f64 scaling_connectivity, blt::f64 distance_factor);
@@ -99,9 +101,20 @@ class graph_t
         
         void reset_mouse_drag()
         {
-            easing.reset();
-            nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+            if (selected_node != -1)
+            {
+                nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+                easing.reset();
+            }
             selected_node = -1;
+        }
+        
+        void reset_mouse_highlight()
+        {
+            if (highlighted_node != -1)
+                nodes[highlighted_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+            highlighted_node = -1;
+            highlight_easing.reset();
         }
         
         void process_mouse_drag(blt::i32 width, blt::i32 height);
@@ -193,11 +206,9 @@ class engine_t
             
             auto& io = ImGui::GetIO();
             
-            if (!io.WantCaptureMouse){
-                if (blt::gfx::isMousePressed(0))
-                    graph.process_mouse_drag(data.width, data.height);
-                else
-                    graph.reset_mouse_drag();
+            if (!io.WantCaptureMouse)
+            {
+                graph.process_mouse_drag(data.width, data.height);
             }
             
             
