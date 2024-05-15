@@ -124,7 +124,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
     {
         auto& node = nodes[selected_node];
         easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-        node.setOutlineColor(easing.apply(color::POINT_OUTLINE_COLOR, color::POINT_SELECT_COLOR));
+        node.setOutlineColor(color::POINT_SELECT_COLOR);
         node.getPositionRef() = mouse_pos;
     }
 }
