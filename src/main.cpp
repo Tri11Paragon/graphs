@@ -48,10 +48,7 @@ void init(const blt::gfx::window_data& data)
     using namespace blt::gfx;
     resources.setPrefixDirectory("../");
     
-    resources.enqueue("res/debian.png", "debian");
-    resources.enqueue("res/parker.png", "parker");
     resources.enqueue("res/parkerpoint.png", "parker_point");
-    resources.enqueue("res/parker cat ears.jpg", "parkercat");
     
     global_matrices.create_internals();
     resources.load_resources();
