@@ -24,16 +24,16 @@
 #include <blt/math/vectors.h>
 #include <imgui.h>
 #include <graph_base.h>
+#include <config.h>
 
 class force_equation
 {
     public:
         using node_pair = const std::pair<blt::size_t, node>&;
     protected:
-        float cooling_rate = 0.999999;
-        float min_cooling = 40;
-        float ideal_spring_length = 175.0;
-        float initial_temperature = 100;
+        float cooling_rate = conf::DEFAULT_COOLING_FACTOR;
+        float min_cooling = conf::DEFAULT_MIN_COOLING;
+        float initial_temperature = conf::DEFAULT_INITIAL_TEMPERATURE;
         
         struct equation_data
         {
@@ -53,7 +53,7 @@ class force_equation
     
     public:
         
-        [[nodiscard]] virtual blt::vec2 attr(node_pair v1, node_pair v2) const = 0;
+        [[nodiscard]] virtual blt::vec2 attr(node_pair v1, node_pair v2, const edge& edge) const = 0;
         
         [[nodiscard]] virtual blt::vec2 rep(node_pair v1, node_pair v2) const = 0;
         
@@ -75,10 +75,9 @@ class force_equation
 class Eades_equation : public force_equation
 {
     protected:
-        float repulsive_constant = 24.0;
         float spring_constant = 12.0;
     public:
-        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2) const final;
+        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2, const edge& edge) const final;
         
         [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final;
         
@@ -93,7 +92,7 @@ class Eades_equation : public force_equation
 class Fruchterman_Reingold_equation : public force_equation
 {
     public:
-        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2) const final;
+        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2, const edge& edge) const final;
         
         [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final;
         

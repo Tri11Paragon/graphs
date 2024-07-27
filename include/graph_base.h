@@ -22,71 +22,49 @@
 #include <blt/gfx/renderer/batch_2d_renderer.h>
 #include <blt/std/types.h>
 #include <blt/std/assert.h>
-#include <color_constants.h>
+#include <config.h>
 
-
-class node
+struct node
 {
-    private:
-        blt::gfx::point2d_t point;
-        float outline_scale = 1.25f;
-        blt::vec2 velocity;
-        blt::color4 outline_color = color::POINT_OUTLINE_COLOR;
-    public:
-        explicit node(const blt::gfx::point2d_t& point): point(point)
-        {}
-        
-        blt::vec2& getVelocityRef()
-        {
-            return velocity;
-        }
-        
-        blt::vec2& getPositionRef()
-        {
-            return point.pos;
-        }
-        
-        [[nodiscard]] const blt::vec2& getPosition() const
-        {
-            return point.pos;
-        }
-        
-        [[nodiscard]] auto& getRenderObj() const
-        {
-            return point;
-        }
-        
-        [[nodiscard]] float getOutlineScale() const
-        {
-            return outline_scale;
-        }
-        
-        void setOutlineScale(float outlineScale)
-        {
-            outline_scale = outlineScale;
-        }
-        
-        [[nodiscard]] const blt::color4& getOutlineColor() const
-        {
-            return outline_color;
-        }
-        
-        void setOutlineColor(const blt::color4& c)
-        {
-            outline_color = c;
-        }
+    float repulsiveness = 24.0f;
+    blt::gfx::point2d_t point;
+    float outline_scale = 1.25f;
+    blt::vec2 velocity;
+    blt::color4 outline_color = conf::POINT_OUTLINE_COLOR;
+    
+    explicit node(const blt::gfx::point2d_t& point): point(point)
+    {}
+    
+    blt::vec2& getVelocityRef()
+    {
+        return velocity;
+    }
+    
+    blt::vec2& getPositionRef()
+    {
+        return point.pos;
+    }
+    
+    [[nodiscard]] const blt::vec2& getPosition() const
+    {
+        return point.pos;
+    }
+    
+    [[nodiscard]] auto& getRenderObj() const
+    {
+        return point;
+    }
 };
 
 
-class edge
+struct edge
 {
-    private:
-        blt::u64 i1, i2;
+        float ideal_spring_length = conf::DEFAULT_SPRING_LENGTH;
         float outline_scale = 2.0f;
         float thickness = 2.0f;
-        blt::color4 color = color::EDGE_COLOR;
-        blt::color4 outline_color = color::EDGE_OUTLINE_COLOR;
-    public:
+        blt::color4 color = conf::EDGE_COLOR;
+        blt::color4 outline_color = conf::EDGE_OUTLINE_COLOR;
+        
         edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
             BLT_ASSERT(i1 != i2 && "Indices cannot be equal!");
@@ -106,46 +84,10 @@ class edge
         {
             return i2;
         }
-        
-        [[nodiscard]] float getOutlineScale() const
-        {
-            return outline_scale;
-        }
-        
-        void setOutlineScale(float outlineScale)
-        {
-            outline_scale = outlineScale;
-        }
-        
-        [[nodiscard]] const blt::color4& getColor() const
-        {
-            return color;
-        }
-        
-        void setColor(const blt::color4& c)
-        {
-            color = c;
-        }
-        
-        [[nodiscard]] const blt::color4& getOutlineColor() const
-        {
-            return outline_color;
-        }
-        
-        void setOutlineColor(const blt::color4& outlineColor)
-        {
-            outline_color = outlineColor;
-        }
-        
-        [[nodiscard]] float getThickness() const
-        {
-            return thickness;
-        }
-        
-        void setThickness(float t)
-        {
-            thickness = t;
-        }
+    
+    private:
+        // we are trying to maintain this as an invariant.
+        blt::u64 i1, i2;
 };
 
 struct edge_hash

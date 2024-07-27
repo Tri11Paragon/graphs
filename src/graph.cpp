@@ -21,7 +21,6 @@
 #include <blt/gfx/raycast.h>
 #include <blt/std/ranges.h>
 #include <blt/math/interpolation.h>
-#include <color_constants.h>
 
 extern blt::gfx::batch_renderer_2d renderer_2d;
 extern blt::gfx::matrix_state_manager global_matrices;
@@ -44,8 +43,8 @@ void graph_t::render()
                 {
                     if (v1.first == v2.first)
                         continue;
-                    if (connected(v1.first, v2.first))
-                        attractive += equation->attr(v1, v2);
+                    if (auto edge = connected(v1.first, v2.first))
+                        attractive += equation->attr(v1, v2, edge->get());
                     repulsive += equation->rep(v1, v2);
                 }
                 v1.second.getVelocityRef() = attractive + repulsive;
@@ -63,7 +62,7 @@ void graph_t::render()
     }
     
     for (const auto& point : nodes)
-        renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info("parker_point", point.getOutlineColor(), point.getOutlineScale()),
+        renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info(conf::DEFAULT_IMAGE),
                                       point.getRenderObj(), 15.0f);
     for (const auto& edge : edges)
     {
@@ -74,8 +73,8 @@ void graph_t::render()
         {
             auto n1 = nodes[edge.getFirst()];
             auto n2 = nodes[edge.getSecond()];
-            auto draw_info = blt::gfx::render_info_t::make_info(edge.getColor(), edge.getOutlineColor(), edge.getOutlineScale());
-            renderer_2d.drawLine(draw_info, 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, edge.getThickness());
+            auto draw_info = blt::gfx::render_info_t::make_info(edge.color);
+            renderer_2d.drawLine(draw_info, 5.0f, n1.getRenderObj().pos, n2.getRenderObj().pos, edge.thickness);
         }
     }
 }
@@ -105,7 +104,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
     if (new_selection != selected_node)
     {
         if (selected_node != -1)
-            nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+            nodes[selected_node].outline_color = conf::POINT_OUTLINE_COLOR;
     }
     
     if (mouse_pressed && new_selection == -1 && selected_node != -1)
@@ -124,7 +123,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
     {
         auto& node = nodes[selected_node];
         easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-        node.setOutlineColor(color::POINT_SELECT_COLOR);
+        node.outline_color = conf::POINT_SELECT_COLOR;
         node.getPositionRef() = mouse_pos;
     }
 }

@@ -19,10 +19,12 @@
 #ifndef GRAPHS_GRAPH_H
 #define GRAPHS_GRAPH_H
 
+#include <config.h>
 #include <graph_base.h>
 #include <force_algorithms.h>
 #include <blt/gfx/window.h>
 #include <blt/math/interpolation.h>
+#include <blt/std/utility.h>
 
 namespace im = ImGui;
 
@@ -99,9 +101,12 @@ class graph_t
             connected_nodes[n2].insert(n1);
         }
         
-        [[nodiscard]] bool connected(blt::u64 e1, blt::u64 e2) const
+        [[nodiscard]] std::optional<blt::ref<const edge>> connected(blt::u64 n1, blt::u64 n2) const
         {
-            return edges.contains({e1, e2});
+            auto itr = edges.find(edge{n1, n2});
+            if (itr == edges.end())
+                return {};
+            return *itr;
         }
         
         void render();
@@ -110,7 +115,7 @@ class graph_t
         {
             if (selected_node != -1)
             {
-                nodes[selected_node].setOutlineColor(color::POINT_OUTLINE_COLOR);
+                nodes[selected_node].outline_color = conf::POINT_OUTLINE_COLOR;
                 easing.reset();
             }
             selected_node = -1;
@@ -214,7 +219,6 @@ class engine_t
             {
                 graph.process_mouse_drag(data.width, data.height);
             }
-            
             
             graph.render();
         }
