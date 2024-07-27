@@ -16,8 +16,56 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <tokenizer.h>
+#include <cctype>
 
-const std::vector<token_t>& proc::tokenizer::tokenize()
+namespace proc
 {
-
+    const std::vector<token_t>& tokenizer::tokenize()
+    {
+        while (has_next())
+        {
+            auto next = advance();
+            if (std::isspace(next))
+            {
+                if (next == '\n')
+                {
+                    state = state_t::NEWLINE;
+                    line_number++;
+                }
+                new_token();
+                continue;
+            }
+            state_t determine = state_t::NONE;
+            if (is_digit(next))
+                determine = state_t::VALUE;
+            else
+            {
+                switch (next)
+                {
+                    case '[':
+                        determine = state_t::SQUARE_OPEN;
+                        break;
+                    case ']':
+                        determine = state_t::SQUARE_CLOSE;
+                        break;
+                    default:
+                        BLT_ERROR("Failed to parse data, error found at character index %ld on line %ld", current_pos, line_number);
+                        BLT_ERROR("Context:");
+                        BLT_ERROR(std::string_view(&data[std::max(0ul, current_pos - 40)], std::min(data.size() - current_pos, current_pos + 40)));
+                        break;
+                }
+            }
+            if (!can_state(determine))
+            {
+                begin = current_pos;
+                new_token();
+            }
+        }
+        return tokens;
+    }
+    
+    bool tokenizer::is_digit(char c) const
+    {
+        return std::isdigit(c) || (state == state_t::VALUE && c == '.');
+    }
 }

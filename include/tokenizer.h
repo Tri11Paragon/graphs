@@ -24,8 +24,9 @@
 
 namespace proc
 {
-    enum class token_e
+    enum class state_t
     {
+        NONE,           // Default state, no token found.
         SQUARE_OPEN,    // [
         SQUARE_CLOSE,   // ]
         CURLY_OPEN,     // {
@@ -35,8 +36,8 @@ namespace proc
         SEMI,           // ;
         COLON,          // :
         COMMENT,        // # or //
-        BLOCK_BEGIN,    // /* or /**
-        BLOCK_CLOSE,    // */
+        COMMENT_BEGIN,    // /* or /**
+        COMMENT_CLOSE,    // */
         STAR,           // *
         TEXT,           // any text inside quotes
         IDENT,          // identifier
@@ -49,7 +50,7 @@ namespace proc
     struct token_t
     {
         // the type of this token
-        token_e token;
+        state_t token;
         // position inside file
         blt::size_t token_pos;
         // all data associated with token. will contain all text if text or the token characters otherwise
@@ -94,8 +95,44 @@ namespace proc
             const std::vector<token_t>& tokenize();
         
         private:
-            std::string data;
+            [[nodiscard]] char peek(blt::size_t offset = 0) const
+            {
+                return data[current_pos + offset];
+            }
+            
+            char advance()
+            {
+                return data[current_pos++];
+            }
+            
+            bool has_next(blt::size_t size = 0)
+            {
+                return (current_pos + size) < data.size();
+            }
+            
+            [[nodiscard]] bool is_digit(char c) const;
+            
+            void new_token()
+            {
+                if (state == state_t::NONE)
+                    return;
+                tokens.push_back({state, begin, {&data[begin], current_pos - begin}});
+                state = state_t::NONE;
+            }
+            
+            bool can_state(state_t s)
+            {
+                return s == state || state == state_t::NONE;
+            }
+        
+        private:
+            state_t state = state_t::NONE;
             blt::size_t current_pos = 0;
+            blt::size_t line_number = 1;
+            blt::size_t begin = current_pos;
+            
+            std::string data;
+            
             std::vector<token_t> tokens;
     };
 }

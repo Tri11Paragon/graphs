@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(graphs VERSION 0.1.0)
+project(graphs VERSION 0.1.1)
 
 option(ENABLE_ADDRSAN "Enable the address sanitizer" OFF)
 option(ENABLE_UBSAN "Enable the ub sanitizer" OFF)
