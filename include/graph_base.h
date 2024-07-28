@@ -27,6 +27,8 @@
 struct node
 {
     float repulsiveness = 24.0f;
+    std::string name;
+    
     blt::gfx::point2d_t point;
     float outline_scale = 1.25f;
     blt::vec2 velocity;

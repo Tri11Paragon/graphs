@@ -23,6 +23,7 @@
 #include <blt/std/time.h>
 #include <blt/math/log_util.h>
 #include <graph.h>
+#include <loader.h>
 
 blt::gfx::matrix_state_manager global_matrices;
 blt::gfx::resource_manager resources;
@@ -42,6 +43,7 @@ namespace im = ImGui;
  *  - ability to remove nodes from graph (make use of multi selection?)
  */
 engine_t engine;
+loader_t loader_data;
 
 void init(const blt::gfx::window_data& data)
 {
@@ -52,6 +54,13 @@ void init(const blt::gfx::window_data& data)
     resources.enqueue("res/parker.png", "parker");
     resources.enqueue("res/parkerpoint.png", "parker_point");
     resources.enqueue("res/parker cat ears.jpg", "parkercat");
+    
+    if (auto loader = loader_t::load_for(engine, data, "default.json", "save.json"))
+    {
+        loader_data = *loader;
+        for (const auto& [key, path] : loader_data.textures)
+            resources.enqueue(path, key);
+    }
     
     global_matrices.create_internals();
     resources.load_resources();
@@ -78,6 +87,9 @@ void update(const blt::gfx::window_data& data)
 int main(int, const char**)
 {
     blt::gfx::init(blt::gfx::window_data{"Force-Directed Graph Drawing", init, update, 1440, 720}.setSyncInterval(1));
+    
+    loader_t::save_for(engine, loader_data, "save.json");
+    
     global_matrices.cleanup();
     resources.cleanup();
     renderer_2d.cleanup();

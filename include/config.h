@@ -29,6 +29,7 @@ namespace conf
     inline constexpr float DEFAULT_SPRING_LENGTH = 175.0;
     inline constexpr float DEFAULT_INITIAL_TEMPERATURE = 100;
     
+    inline constexpr float POINT_SIZE = 35;
     inline constexpr auto DEFAULT_IMAGE = "parker_point";
     inline constexpr auto POINT_OUTLINE_COLOR = blt::make_color(0, 0.6, 0.6);
     inline constexpr auto POINT_HIGHLIGHT_COLOR = blt::make_color(0, 1.0, 1.0);
@@ -37,5 +38,8 @@ namespace conf
     inline constexpr auto EDGE_COLOR = blt::make_color(0, 0.8, 0);
     inline constexpr auto EDGE_OUTLINE_COLOR = blt::make_color(0, 1, 0);
 }
+
+class graph_t;
+struct loader_t;
 
 #endif //GRAPHS_CONFIG_H

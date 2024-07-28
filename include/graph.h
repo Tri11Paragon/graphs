@@ -52,8 +52,10 @@ struct bounding_box
 
 class graph_t
 {
+        friend struct loader_t;
     private:
         std::vector<node> nodes;
+        blt::hashmap_t<std::string, blt::u64> names_to_node;
         blt::hashset_t<edge, edge_hash> edges;
         blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64>> connected_nodes;
         bool sim = false;
@@ -64,7 +66,6 @@ class graph_t
         int current_iterations = 0;
         int max_iterations = 5000;
         std::unique_ptr<force_equation> equation;
-        static constexpr float POINT_SIZE = 35;
         
         blt::i32 selected_node = -1;
         blt::quad_easing easing;
@@ -74,12 +75,14 @@ class graph_t
                                  blt::f64 scaling_connectivity, blt::f64 distance_factor);
     
     public:
-        graph_t() = default;
+        graph_t()
+        {
+            use_Eades();
+        }
         
         void make_new(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity)
         {
             create_random_graph(bb, min_nodes, max_nodes, connectivity, 0, 25);
-            use_Eades();
         }
         
         void reset(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
@@ -198,6 +201,7 @@ class graph_t
 
 class engine_t
 {
+        friend struct loader_t;
     private:
         graph_t graph;
         

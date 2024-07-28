@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(graphs VERSION 0.1.1)
+project(graphs VERSION 0.1.2)
 
 option(ENABLE_ADDRSAN "Enable the address sanitizer" OFF)
 option(ENABLE_UBSAN "Enable the ub sanitizer" OFF)
@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(lib/BLT-With-Graphics-Template SYSTEM)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(lib/json)
 
 include_directories(include/)
 file(GLOB_RECURSE PROJECT_BUILD_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -21,6 +23,7 @@ target_compile_options(graphs PRIVATE -Wall -Wextra -Wno-comment)
 target_link_options(graphs PRIVATE -Wall -Wextra -Wno-comment)
 
 target_link_libraries(graphs PUBLIC BLT_WITH_GRAPHICS)
+target_link_libraries(graphs PRIVATE nlohmann_json::nlohmann_json)
 
 if (${ENABLE_ADDRSAN} MATCHES ON)
     target_compile_options(graphs PRIVATE -fsanitize=address)

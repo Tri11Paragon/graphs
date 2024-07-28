@@ -94,7 +94,7 @@ void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
         
         const auto mag = dist.magnitude();
         
-        if (mag < POINT_SIZE && mouse_pressed)
+        if (mag < conf::POINT_SIZE && mouse_pressed)
         {
             new_selection = static_cast<blt::i32>(index);
             break;
@@ -137,10 +137,10 @@ void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, 
     // don't allow points too close to the edges of the window.
     if (bb.is_screen)
     {
-        bb.max_x -= POINT_SIZE;
-        bb.max_y -= POINT_SIZE;
-        bb.min_x += POINT_SIZE;
-        bb.min_y += POINT_SIZE;
+        bb.max_x -= conf::POINT_SIZE;
+        bb.max_y -= conf::POINT_SIZE;
+        bb.min_x += conf::POINT_SIZE;
+        bb.min_y += conf::POINT_SIZE;
     }
     static std::random_device dev;
     static std::uniform_real_distribution chance(0.0, 1.0);
@@ -164,7 +164,7 @@ void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, 
                 const float dx = rp.x() - x;
                 const float dy = rp.y() - y;
                 
-                if (const float dist = std::sqrt(dx * dx + dy * dy); dist <= POINT_SIZE)
+                if (const float dist = std::sqrt(dx * dx + dy * dy); dist <= conf::POINT_SIZE)
                 {
                     can_break = false;
                     break;
@@ -173,7 +173,7 @@ void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, 
             if (can_break)
                 break;
         } while (true);
-        nodes.push_back(node({x, y, POINT_SIZE}));
+        nodes.push_back(node({x, y, conf::POINT_SIZE}));
     }
     
     for (const auto& [index1, node1] : blt::enumerate(nodes))

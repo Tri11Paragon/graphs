@@ -1,3 +1,6 @@
 [submodule "lib/BLT-With-Graphics-Template"]
 	path = lib/BLT-With-Graphics-Template
 	url = https://git.tpgc.me/tri11paragon/BLT-With-Graphics-Template
+[submodule "lib/json"]
+	path = lib/json
+	url = https://github.com/nlohmann/json.git
