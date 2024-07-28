@@ -61,9 +61,13 @@ void graph_t::render()
         }
     }
     
-    for (const auto& point : nodes)
-        renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info(conf::DEFAULT_IMAGE),
-                                      point.getRenderObj(), 15.0f);
+    for (const auto& [index, point] : blt::enumerate(nodes))
+    {
+        auto& obj = point.getRenderObj();
+        auto f_index = static_cast<blt::f32>(index) + 1;
+        renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info(point.texture), obj, 15.0f * f_index);
+        renderer_2d.drawPointInternal(blt::gfx::render_info_t::make_info(point.outline_color), obj.apply_scale(point.outline_scale), 14.0f * f_index);
+    }
     for (const auto& edge : edges)
     {
         if (edge.getFirst() >= nodes.size() || edge.getSecond() >= nodes.size())

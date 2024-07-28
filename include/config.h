@@ -35,6 +35,7 @@ namespace conf
     inline constexpr auto POINT_HIGHLIGHT_COLOR = blt::make_color(0, 1.0, 1.0);
     inline constexpr auto POINT_SELECT_COLOR = blt::make_color(0, 0.9, 0.7);
     
+    inline constexpr float DEFAULT_THICKNESS = 2.0f;
     inline constexpr auto EDGE_COLOR = blt::make_color(0, 0.8, 0);
     inline constexpr auto EDGE_OUTLINE_COLOR = blt::make_color(0, 1, 0);
 }

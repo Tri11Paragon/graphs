@@ -36,6 +36,7 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
                                            std::optional<std::string_view> save_path)
 {
     auto& graph = engine.graph;
+    graph.clear();
     
     static std::random_device dev;
     std::uniform_real_distribution pos_x_dist(0.0, static_cast<blt::f64>(window_data.width));
@@ -64,25 +65,37 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
     
     if (data.contains("nodes"))
     {
-        graph.nodes.clear();
-        
         for (const auto& node : data["nodes"])
         {
             auto x = static_cast<blt::f32>(load_with_default(node, "x", pos_x_dist(dev)));
             auto y = static_cast<blt::f32>(load_with_default(node, "y", pos_y_dist(dev)));
-            auto size = static_cast<blt::f32>(load_with_default(node, "size", static_cast<f64>(conf::POINT_SIZE)));
+            auto size = static_cast<blt::f32>(load_with_default(node, "size", static_cast<blt::f64>(conf::POINT_SIZE)));
             auto name = load_with_default<std::string>(node, "name", "unnamed");
+            auto texture = load_with_default<std::string>(node, "texture", conf::DEFAULT_IMAGE);
             
             graph.names_to_node.insert({name, static_cast<blt::u64>(graph.nodes.size())});
             graph.nodes.emplace_back(blt::gfx::point2d_t{x, y, size});
             graph.nodes.back().name = std::move(name);
+            graph.nodes.back().texture = std::move(texture);
         }
     }
     
     if (data.contains("connections"))
     {
-        graph.edges.clear();
-        graph.connected_nodes.clear();
+        for (const auto& edge : data["edges"])
+        {
+            auto& nodes = edge["nodes"];
+            auto index1 = nodes[0].get<std::string>();
+            auto index2 = nodes[1].get<std::string>();
+            auto ideal_length = load_with_default(edge, "length", conf::DEFAULT_SPRING_LENGTH);
+            auto thickness = load_with_default(edge, "thickness", conf::DEFAULT_THICKNESS);
+            
+            ::edge e{graph.names_to_node[index1], graph.names_to_node[index2]};
+            e.ideal_spring_length = ideal_length;
+            e.thickness = thickness;
+            
+            graph.connect(e);
+        }
     }
     
     return loader;

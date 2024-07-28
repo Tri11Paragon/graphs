@@ -27,11 +27,12 @@
 struct node
 {
     float repulsiveness = 24.0f;
-    std::string name;
+    std::string name = "unnamed";
+    std::string texture = conf::DEFAULT_IMAGE;
     
     blt::gfx::point2d_t point;
-    float outline_scale = 1.25f;
     blt::vec2 velocity;
+    float outline_scale = 1.25f;
     blt::color4 outline_color = conf::POINT_OUTLINE_COLOR;
     
     explicit node(const blt::gfx::point2d_t& point): point(point)
@@ -62,10 +63,8 @@ struct node
 struct edge
 {
         float ideal_spring_length = conf::DEFAULT_SPRING_LENGTH;
-        float outline_scale = 2.0f;
-        float thickness = 2.0f;
+        float thickness = conf::DEFAULT_THICKNESS;
         blt::color4 color = conf::EDGE_COLOR;
-        blt::color4 outline_color = conf::EDGE_OUTLINE_COLOR;
         
         edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
@@ -99,5 +98,14 @@ struct edge_hash
         return e.getFirst() * e.getSecond();
     }
 };
+
+struct edge_eq
+{
+    bool operator()(const edge& e1, const edge& e2) const
+    {
+        return e1 == e2;
+    }
+};
+
 
 #endif //GRAPHS_GRAPH_BASE_H

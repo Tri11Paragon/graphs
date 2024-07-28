@@ -56,7 +56,7 @@ class graph_t
     private:
         std::vector<node> nodes;
         blt::hashmap_t<std::string, blt::u64> names_to_node;
-        blt::hashset_t<edge, edge_hash> edges;
+        blt::hashset_t<edge, edge_hash, edge_eq> edges;
         blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64>> connected_nodes;
         bool sim = false;
         bool run_infinitely = true;
@@ -88,20 +88,32 @@ class graph_t
         void reset(const bounding_box& bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
                    const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
         {
+            clear();
+            create_random_graph(bb, min_nodes, max_nodes, connectivity, scaling_connectivity, distance_factor);
+        }
+        
+        void clear()
+        {
             sim = false;
             current_iterations = 0;
             max_force_last = 1.0;
             nodes.clear();
             edges.clear();
             connected_nodes.clear();
-            create_random_graph(bb, min_nodes, max_nodes, connectivity, scaling_connectivity, distance_factor);
         }
         
         void connect(const blt::u64 n1, const blt::u64 n2)
         {
-            edges.insert(edge{n1, n2});
             connected_nodes[n1].insert(n2);
             connected_nodes[n2].insert(n1);
+            edges.insert({n1, n2});
+        }
+        
+        void connect(const edge& edge)
+        {
+            connected_nodes[edge.getFirst()].insert(edge.getSecond());
+            connected_nodes[edge.getSecond()].insert(edge.getFirst());
+            edges.insert(edge);
         }
         
         [[nodiscard]] std::optional<blt::ref<const edge>> connected(blt::u64 n1, blt::u64 n2) const
