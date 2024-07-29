@@ -41,6 +41,7 @@ namespace conf
 }
 
 class graph_t;
+class selector_t;
 struct loader_t;
 
 #endif //GRAPHS_CONFIG_H

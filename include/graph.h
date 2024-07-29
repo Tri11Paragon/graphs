@@ -21,20 +21,13 @@
 
 #include <config.h>
 #include <graph_base.h>
+#include <selection.h>
 #include <force_algorithms.h>
 #include <blt/gfx/window.h>
 #include <blt/math/interpolation.h>
 #include <blt/std/utility.h>
 
 namespace im = ImGui;
-
-enum class anim_state_t
-{
-    NONE,
-    HIGHLIGHT_NODE,
-    SELECT_NODE,
-    HIGHLIGHT_TO_SELECT
-};
 
 struct bounding_box
 {
@@ -53,6 +46,7 @@ struct bounding_box
 class graph_t
 {
         friend struct loader_t;
+        friend class selector_t;
     private:
         std::vector<node_t> nodes;
         blt::hashmap_t<std::string, blt::u64> names_to_node;
@@ -66,14 +60,7 @@ class graph_t
         int current_iterations = 0;
         int max_iterations = 5000;
         std::unique_ptr<force_equation> equation;
-        
-        blt::i64 last_selected_node = -1;
-        blt::i64 last_selected_node2 = -1;
-        bool is_edge = false;
-        
-        blt::quad_easing easing;
-        blt::quint_easing highlight_easing;
-        
+
         void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity,
                                  blt::f64 scaling_connectivity, blt::f64 distance_factor);
     
@@ -129,17 +116,6 @@ class graph_t
         }
         
         void render();
-        
-        void reset_mouse_drag();
-        
-        void reset_mouse_highlight()
-        {
-            highlight_easing.reset();
-        }
-        
-        void process_mouse_drag(blt::i32 width, blt::i32 height);
-        
-        void handle_mouse();
         
         void use_Eades()
         {
@@ -212,6 +188,7 @@ class engine_t
         friend struct loader_t;
     private:
         graph_t graph;
+        selector_t selector;
         
         void draw_gui(const blt::gfx::window_data& data);
     
@@ -228,11 +205,10 @@ class engine_t
             auto& io = ImGui::GetIO();
             
             if (!io.WantCaptureMouse)
-            {
-                graph.process_mouse_drag(data.width, data.height);
-            }
+                selector.process_mouse(graph, data.width, data.height);
             
             graph.render();
+            selector.render(graph, data.width, data.height);
         }
 };
 

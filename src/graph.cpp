@@ -83,59 +83,6 @@ void graph_t::render()
     }
 }
 
-// called every frame as long as imgui doesn't require the mouse.
-void graph_t::process_mouse_drag(const blt::i32 width, const blt::i32 height)
-{
-    const auto mouse_pos = blt::make_vec2(blt::gfx::calculateRay2D(width, height, global_matrices.getScale2D(), global_matrices.getView2D(),
-                                                                   global_matrices.getOrtho()));
-    
-    bool mouse_pressed = blt::gfx::isMousePressed(0);
-    blt::i64 new_selection = -1;
-    
-    for (const auto& [index, node] : blt::enumerate(nodes))
-    {
-        const auto pos = node.getPosition();
-        const auto dist = pos - mouse_pos;
-        
-        const auto mag = dist.magnitude();
-        
-        if (mag < node.getRenderObj().scale && mouse_pressed)
-        {
-            new_selection = static_cast<blt::i64>(index);
-            break;
-        }
-    }
-    
-    if (new_selection != last_selected_node)
-    {
-        if (last_selected_node != -1)
-            nodes[last_selected_node].outline_color = conf::POINT_OUTLINE_COLOR;
-    }
-    
-    if (mouse_pressed && new_selection == -1 && last_selected_node != -1)
-    {
-        last_selected_node = -1;
-    }
-    
-    last_selected_node = new_selection;
-    
-    if (!mouse_pressed && blt::gfx::mouseReleaseLastFrame())
-    {
-        reset_mouse_drag();
-    }
-    
-    if (last_selected_node != -1 && mouse_pressed)
-    {
-        auto& node = nodes[last_selected_node];
-        easing.progress(8 * static_cast<float>(blt::gfx::getFrameDeltaSeconds()));
-        node.outline_color = conf::POINT_SELECT_COLOR;
-        node.getPositionRef() = mouse_pos;
-    }
-}
-
-void graph_t::handle_mouse()
-{}
-
 void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, const blt::size_t max_nodes, const blt::f64 connectivity,
                                   const blt::f64 scaling_connectivity, const blt::f64 distance_factor)
 {
@@ -219,16 +166,6 @@ void graph_t::create_random_graph(bounding_box bb, const blt::size_t min_nodes, 
             }
         }
     }
-}
-
-void graph_t::reset_mouse_drag()
-{
-    if (last_selected_node != -1)
-    {
-        nodes[last_selected_node].outline_color = conf::POINT_OUTLINE_COLOR;
-        easing.reset();
-    }
-    last_selected_node = -1;
 }
 
 void engine_t::draw_gui(const blt::gfx::window_data& data)
@@ -332,11 +269,7 @@ void engine_t::draw_gui(const blt::gfx::window_data& data)
                 }
             }
         }
-        im::SetNextItemOpen(true, ImGuiCond_Once);
-        if (im::CollapsingHeader("Node Information"))
-        {
-        
-        }
+        selector.draw_gui(graph, data.width, data.height);
         im::End();
     }
 }
