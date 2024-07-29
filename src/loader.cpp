@@ -80,13 +80,22 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
         }
     }
     
-    if (data.contains("connections"))
+    if (data.contains("edges"))
     {
         for (const auto& edge : data["edges"])
         {
-            auto& nodes = edge["nodes"];
-            auto index1 = nodes[0].get<std::string>();
-            auto index2 = nodes[1].get<std::string>();
+            std::string index1;
+            std::string index2;
+            if (edge.is_array())
+            {
+                index1 = edge[0].get<std::string>();
+                index2 = edge[1].get<std::string>();
+            } else
+            {
+                auto& nodes = edge["nodes"];
+                index1 = nodes[0].get<std::string>();
+                index2 = nodes[1].get<std::string>();
+            }
             auto ideal_length = load_with_default(edge, "length", conf::DEFAULT_SPRING_LENGTH);
             auto thickness = load_with_default(edge, "thickness", conf::DEFAULT_THICKNESS);
             
@@ -95,6 +104,32 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
             e.thickness = thickness;
             
             graph.connect(e);
+        }
+    }
+    
+    if (data.contains("descriptions"))
+    {
+        for (const auto& desc : data["descriptions"])
+        {
+            if (auto node = graph.names_to_node.find(desc["name"].get<std::string>()); node != graph.names_to_node.end())
+                graph.nodes[node->second].description = desc["description"];
+        }
+    }
+    
+    if (data.contains("relationships"))
+    {
+        for (const auto& desc : data["relationships"])
+        {
+            auto nodes = desc["nodes"];
+            auto n1 = graph.names_to_node[nodes[0].get<std::string>()];
+            auto n2 = graph.names_to_node[nodes[2].get<std::string>()];
+            if (auto node = graph.edges.find({n1, n2}); node != graph.edges.end())
+            {
+                edge e = *node;
+                e.description = desc["description"];
+                graph.edges.erase({n1, n2});
+                graph.edges.insert(e);
+            }
         }
     }
     

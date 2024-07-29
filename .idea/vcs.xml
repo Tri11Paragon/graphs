@@ -7,5 +7,6 @@
     <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/BLT/libraries/parallel-hashmap" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/imgui" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/BLT-With-Graphics-Template/libraries/openal-soft" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/json" vcs="Git" />
   </component>
 </project>

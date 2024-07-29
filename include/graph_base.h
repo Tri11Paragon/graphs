@@ -28,6 +28,7 @@ struct node
 {
     float repulsiveness = 24.0f;
     std::string name = "unnamed";
+    std::string description;
     std::string texture = conf::DEFAULT_IMAGE;
     
     blt::gfx::point2d_t point;
@@ -65,6 +66,7 @@ struct edge
         float ideal_spring_length = conf::DEFAULT_SPRING_LENGTH;
         float thickness = conf::DEFAULT_THICKNESS;
         blt::color4 color = conf::EDGE_COLOR;
+        std::string description;
         
         edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
