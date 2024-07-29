@@ -31,7 +31,7 @@ BLT_ATTRIB_NO_SIDE_EFFECTS inline float mix(const float v1, const float v2)
  * --------------------------------------------------------
  */
 
-force_equation::equation_data force_equation::calc_data(const std::pair<blt::size_t, node>& v1, const std::pair<blt::size_t, node>& v2)
+force_equation::equation_data force_equation::calc_data(const std::pair<blt::size_t, node_t>& v1, const std::pair<blt::size_t, node_t>& v2)
 {
     auto dir = dir_v(v1, v2);
     auto dir2 = dir_v(v2, v1);
@@ -57,13 +57,13 @@ void force_equation::draw_inputs_base()
  * --------------------------------------------------------
  */
 
-blt::vec2 Eades_equation::attr(const std::pair<blt::size_t, node>& v1, const std::pair<blt::size_t, node>& v2, const edge& edge) const
+blt::vec2 Eades_equation::attr(const std::pair<blt::size_t, node_t>& v1, const std::pair<blt::size_t, node_t>& v2, const edge_t& edge) const
 {
     auto data = calc_data(v1, v2);
     return (spring_constant * std::log(data.mag / edge.ideal_spring_length) * data.unit) - rep(v1, v2);
 }
 
-blt::vec2 Eades_equation::rep(const std::pair<blt::size_t, node>& v1, const std::pair<blt::size_t, node>& v2) const
+blt::vec2 Eades_equation::rep(const std::pair<blt::size_t, node_t>& v1, const std::pair<blt::size_t, node_t>& v2) const
 {
     auto data = calc_data(v1, v2);
     // scaling factor included because of the scales this algorithm is working on (large viewport)
@@ -83,14 +83,14 @@ void Eades_equation::draw_inputs()
  * --------------------------------------------------------
  */
 
-blt::vec2 Fruchterman_Reingold_equation::attr(const std::pair<blt::size_t, node>& v1, const std::pair<blt::size_t, node>& v2, const edge& edge) const
+blt::vec2 Fruchterman_Reingold_equation::attr(const std::pair<blt::size_t, node_t>& v1, const std::pair<blt::size_t, node_t>& v2, const edge_t& edge) const
 {
     auto data = calc_data(v1, v2);
     float scale = data.mag_sq / edge.ideal_spring_length;
     return (scale * data.unit);
 }
 
-blt::vec2 Fruchterman_Reingold_equation::rep(const std::pair<blt::size_t, node>& v1, const std::pair<blt::size_t, node>& v2) const
+blt::vec2 Fruchterman_Reingold_equation::rep(const std::pair<blt::size_t, node_t>& v1, const std::pair<blt::size_t, node_t>& v2) const
 {
     auto data = calc_data(v1, v2);
     const auto ideal_spring_length = conf::DEFAULT_SPRING_LENGTH;

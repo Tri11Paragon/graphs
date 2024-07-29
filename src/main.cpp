@@ -60,13 +60,12 @@ void init(const blt::gfx::window_data& data)
         loader_data = *loader;
         for (const auto& [key, path] : loader_data.textures)
             resources.enqueue(path, key);
-    }
+    } else
+        engine.init(data);
     
     global_matrices.create_internals();
     resources.load_resources();
     renderer_2d.create();
-    
-    engine.init(data);
 }
 
 void update(const blt::gfx::window_data& data)

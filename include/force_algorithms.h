@@ -29,7 +29,7 @@
 class force_equation
 {
     public:
-        using node_pair = const std::pair<blt::size_t, node>&;
+        using node_pair = const std::pair<blt::size_t, node_t>&;
     protected:
         float cooling_rate = conf::DEFAULT_COOLING_FACTOR;
         float min_cooling = conf::DEFAULT_MIN_COOLING;
@@ -53,7 +53,7 @@ class force_equation
     
     public:
         
-        [[nodiscard]] virtual blt::vec2 attr(node_pair v1, node_pair v2, const edge& edge) const = 0;
+        [[nodiscard]] virtual blt::vec2 attr(node_pair v1, node_pair v2, const edge_t& edge) const = 0;
         
         [[nodiscard]] virtual blt::vec2 rep(node_pair v1, node_pair v2) const = 0;
         
@@ -77,7 +77,7 @@ class Eades_equation : public force_equation
     protected:
         float spring_constant = 12.0;
     public:
-        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2, const edge& edge) const final;
+        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2, const edge_t& edge) const final;
         
         [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final;
         
@@ -92,7 +92,7 @@ class Eades_equation : public force_equation
 class Fruchterman_Reingold_equation : public force_equation
 {
     public:
-        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2, const edge& edge) const final;
+        [[nodiscard]] blt::vec2 attr(node_pair v1, node_pair v2, const edge_t& edge) const final;
         
         [[nodiscard]] blt::vec2 rep(node_pair v1, node_pair v2) const final;
         

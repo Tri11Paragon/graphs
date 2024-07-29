@@ -54,9 +54,9 @@ class graph_t
 {
         friend struct loader_t;
     private:
-        std::vector<node> nodes;
+        std::vector<node_t> nodes;
         blt::hashmap_t<std::string, blt::u64> names_to_node;
-        blt::hashset_t<edge, edge_hash, edge_eq> edges;
+        blt::hashset_t<edge_t, edge_hash, edge_eq> edges;
         blt::hashmap_t<blt::u64, blt::hashset_t<blt::u64>> connected_nodes;
         bool sim = false;
         bool run_infinitely = true;
@@ -67,7 +67,10 @@ class graph_t
         int max_iterations = 5000;
         std::unique_ptr<force_equation> equation;
         
-        blt::i32 selected_node = -1;
+        blt::i64 last_selected_node = -1;
+        blt::i64 last_selected_node2 = -1;
+        bool is_edge = false;
+        
         blt::quad_easing easing;
         blt::quint_easing highlight_easing;
         
@@ -100,6 +103,7 @@ class graph_t
             nodes.clear();
             edges.clear();
             connected_nodes.clear();
+            names_to_node.clear();
         }
         
         void connect(const blt::u64 n1, const blt::u64 n2)
@@ -109,16 +113,16 @@ class graph_t
             edges.insert({n1, n2});
         }
         
-        void connect(const edge& edge)
+        void connect(const edge_t& edge)
         {
             connected_nodes[edge.getFirst()].insert(edge.getSecond());
             connected_nodes[edge.getSecond()].insert(edge.getFirst());
             edges.insert(edge);
         }
         
-        [[nodiscard]] std::optional<blt::ref<const edge>> connected(blt::u64 n1, blt::u64 n2) const
+        [[nodiscard]] std::optional<blt::ref<const edge_t>> connected(blt::u64 n1, blt::u64 n2) const
         {
-            auto itr = edges.find(edge{n1, n2});
+            auto itr = edges.find(edge_t{n1, n2});
             if (itr == edges.end())
                 return {};
             return *itr;
@@ -126,15 +130,7 @@ class graph_t
         
         void render();
         
-        void reset_mouse_drag()
-        {
-            if (selected_node != -1)
-            {
-                nodes[selected_node].outline_color = conf::POINT_OUTLINE_COLOR;
-                easing.reset();
-            }
-            selected_node = -1;
-        }
+        void reset_mouse_drag();
         
         void reset_mouse_highlight()
         {

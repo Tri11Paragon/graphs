@@ -18,7 +18,6 @@
 #include <loader.h>
 #include <blt/std/logging.h>
 #include <fstream>
-#include <istream>
 #include <random>
 #include <nlohmann/json.hpp>
 
@@ -70,12 +69,12 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
             auto x = static_cast<blt::f32>(load_with_default(node, "x", pos_x_dist(dev)));
             auto y = static_cast<blt::f32>(load_with_default(node, "y", pos_y_dist(dev)));
             auto size = static_cast<blt::f32>(load_with_default(node, "size", static_cast<blt::f64>(conf::POINT_SIZE)));
-            auto name = load_with_default<std::string>(node, "name", "unnamed");
+            auto name = load_with_default<std::string>(node, "name", get_name());
             auto texture = load_with_default<std::string>(node, "texture", conf::DEFAULT_IMAGE);
             
+            BLT_ASSERT(!graph.names_to_node.contains(name) && "Graph node name must be unique!");
             graph.names_to_node.insert({name, static_cast<blt::u64>(graph.nodes.size())});
-            graph.nodes.emplace_back(blt::gfx::point2d_t{x, y, size});
-            graph.nodes.back().name = std::move(name);
+            graph.nodes.emplace_back(blt::gfx::point2d_t{x, y, size}, std::move(name));
             graph.nodes.back().texture = std::move(texture);
         }
     }
@@ -99,7 +98,7 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
             auto ideal_length = load_with_default(edge, "length", conf::DEFAULT_SPRING_LENGTH);
             auto thickness = load_with_default(edge, "thickness", conf::DEFAULT_THICKNESS);
             
-            ::edge e{graph.names_to_node[index1], graph.names_to_node[index2]};
+            ::edge_t e{graph.names_to_node[index1], graph.names_to_node[index2]};
             e.ideal_spring_length = ideal_length;
             e.thickness = thickness;
             
@@ -113,6 +112,8 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
         {
             if (auto node = graph.names_to_node.find(desc["name"].get<std::string>()); node != graph.names_to_node.end())
                 graph.nodes[node->second].description = desc["description"];
+            else
+                BLT_WARN("Node %s doesn't exist!", desc["name"].get<std::string>().c_str());
         }
     }
     
@@ -122,14 +123,15 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
         {
             auto nodes = desc["nodes"];
             auto n1 = graph.names_to_node[nodes[0].get<std::string>()];
-            auto n2 = graph.names_to_node[nodes[2].get<std::string>()];
+            auto n2 = graph.names_to_node[nodes[1].get<std::string>()];
             if (auto node = graph.edges.find({n1, n2}); node != graph.edges.end())
             {
-                edge e = *node;
+                edge_t e = *node;
                 e.description = desc["description"];
                 graph.edges.erase({n1, n2});
                 graph.edges.insert(e);
-            }
+            } else
+                BLT_WARN("Edge %s -> %s doesn't exist!", nodes[0].get<std::string>().c_str(), nodes[1].get<std::string>().c_str());
         }
     }
     
@@ -138,5 +140,50 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
 
 void loader_t::save_for(engine_t& engine, const loader_t& loader, std::string_view path)
 {
-
+    auto& graph = engine.graph;
+    json data;
+    data["textures"] = json::array();
+    data["nodes"] = json::array();
+    data["edges"] = json::array();
+    data["descriptions"] = json::array();
+    data["relationships"] = json::array();
+    
+    for (const auto& [key, t_path] : loader.textures)
+    {
+        data["textures"].push_back(json{
+                {"name", key},
+                {"path", t_path}
+        });
+    }
+    
+    for (const auto& node : graph.nodes)
+    {
+        data["nodes"].push_back(json{
+                {"name",    node.name},
+                {"texture", node.texture},
+                {"size",    node.getRenderObj().scale},
+                {"x",       node.getPosition().x()},
+                {"y",       node.getPosition().y()},
+        });
+        data["descriptions"].push_back(json{
+                {"name", node.name},
+                {"description", node.description}
+        });
+    }
+    
+    for (const auto& edge : graph.edges)
+    {
+        data["edges"].push_back(json{
+                {"nodes", json::array_t{graph.nodes[edge.getFirst()].name, graph.nodes[edge.getSecond()].name}},
+                {"length", edge.ideal_spring_length},
+                {"thickness", edge.thickness}
+        });
+        data["relationships"].push_back(json{
+                {"nodes", json::array_t{graph.nodes[edge.getFirst()].name, graph.nodes[edge.getSecond()].name}},
+                {"description", edge.description}
+        });
+    }
+    
+    std::ofstream file{std::string(path)};
+    file << data.dump(4);
 }

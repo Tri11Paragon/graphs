@@ -24,10 +24,17 @@
 #include <blt/std/assert.h>
 #include <config.h>
 
-struct node
+inline blt::size_t last_node = 0;
+
+inline std::string get_name()
+{
+    return "unnamed" + std::to_string(last_node++);
+}
+
+struct node_t
 {
     float repulsiveness = 24.0f;
-    std::string name = "unnamed";
+    std::string name;
     std::string description;
     std::string texture = conf::DEFAULT_IMAGE;
     
@@ -36,8 +43,13 @@ struct node
     float outline_scale = 1.25f;
     blt::color4 outline_color = conf::POINT_OUTLINE_COLOR;
     
-    explicit node(const blt::gfx::point2d_t& point): point(point)
+    explicit node_t(const blt::gfx::point2d_t& point): name(get_name()), point(point)
     {}
+    
+    explicit node_t(const blt::gfx::point2d_t& point, std::string name): name(std::move(name)), point(point)
+    {
+        BLT_ASSERT(!this->name.empty() && "Name should not be empty!");
+    }
     
     blt::vec2& getVelocityRef()
     {
@@ -61,19 +73,19 @@ struct node
 };
 
 
-struct edge
+struct edge_t
 {
         float ideal_spring_length = conf::DEFAULT_SPRING_LENGTH;
         float thickness = conf::DEFAULT_THICKNESS;
         blt::color4 color = conf::EDGE_COLOR;
         std::string description;
         
-        edge(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
+        edge_t(blt::u64 i1, blt::u64 i2): i1(i1), i2(i2)
         {
             BLT_ASSERT(i1 != i2 && "Indices cannot be equal!");
         }
         
-        inline friend bool operator==(edge e1, edge e2)
+        inline friend bool operator==(edge_t e1, edge_t e2)
         {
             return (e1.i1 == e2.i1 || e1.i1 == e2.i2) && (e1.i2 == e2.i1 || e1.i2 == e2.i2);
         }
@@ -95,7 +107,7 @@ struct edge
 
 struct edge_hash
 {
-    blt::u64 operator()(const edge& e) const
+    blt::u64 operator()(const edge_t& e) const
     {
         return e.getFirst() * e.getSecond();
     }
@@ -103,7 +115,7 @@ struct edge_hash
 
 struct edge_eq
 {
-    bool operator()(const edge& e1, const edge& e2) const
+    bool operator()(const edge_t& e1, const edge_t& e2) const
     {
         return e1 == e2;
     }
