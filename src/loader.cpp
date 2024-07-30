@@ -98,7 +98,7 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
             auto ideal_length = load_with_default(edge, "length", conf::DEFAULT_SPRING_LENGTH);
             auto thickness = load_with_default(edge, "thickness", conf::DEFAULT_THICKNESS);
             
-            ::edge_t e{graph.names_to_node[index1], graph.names_to_node[index2]};
+            edge_t e{graph.names_to_node[index1], graph.names_to_node[index2]};
             e.ideal_spring_length = ideal_length;
             e.thickness = thickness;
             

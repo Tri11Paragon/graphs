@@ -192,13 +192,45 @@ void selector_t::destroy_node(blt::i64 node)
 {
     auto& node_v = graph.nodes[node];
     graph.names_to_node.erase(node_v.name);
-    erase_if(graph.edges, [node](const edge_t& v) {
-        return static_cast<blt::i64>(v.getFirst()) == node || static_cast<blt::i64>(v.getSecond()) == node;
+    erase_if(graph.edges, [node](const edge_t& e) {
+        return static_cast<blt::i64>(e.getFirst()) == node || static_cast<blt::i64>(e.getSecond()) == node;
     });
+    std::vector<edge_t> corrected_edges;
+    for (const edge_t& v : graph.edges)
+    {
+        auto copy = v;
+        auto c = static_cast<blt::u64>(node);
+        if (copy.i1 > c)
+            copy.i1--;
+        if (copy.i2 > c)
+            copy.i2--;
+        if (v.i1 > c || v.i2 > c)
+            corrected_edges.push_back(copy);
+    }
+    erase_if(graph.edges, [node](const edge_t& e) {
+        return static_cast<blt::i64>(e.getFirst()) > node || static_cast<blt::i64>(e.getSecond()) > node;
+    });
+    for (const auto& v : corrected_edges)
+        graph.edges.insert(v);
     graph.connected_nodes.erase(node);
     for (auto& v : graph.connected_nodes)
     {
-        v.second.erase(node);
+        auto& map = v.second;
+        // generate the list of corrected nodes.
+        std::vector<blt::u64> corrected_nodes;
+        for (auto& n : map)
+        {
+            // shift back then nodes after this one by one
+            if (static_cast<blt::i64>(n) > node)
+            {
+                corrected_nodes.push_back(n - 1);
+            }
+        }
+        erase_if(map, [node](blt::u64 n) {
+            return static_cast<blt::i64>(n) > node;
+        });
+        for (const auto& n : corrected_nodes)
+            map.insert(n);
     }
     
     graph.nodes.erase(graph.nodes.begin() + node);

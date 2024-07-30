@@ -75,6 +75,8 @@ struct node_t
 
 struct edge_t
 {
+    // fuck you too :3
+    friend selector_t;
         float ideal_spring_length = conf::DEFAULT_SPRING_LENGTH;
         float thickness = conf::DEFAULT_THICKNESS;
         blt::color4 color = conf::EDGE_COLOR;
