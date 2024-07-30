@@ -46,7 +46,9 @@ struct bounding_box
 class graph_t
 {
         friend struct loader_t;
+        
         friend class selector_t;
+    
     private:
         std::vector<node_t> nodes;
         blt::hashmap_t<std::string, blt::u64> names_to_node;
@@ -60,7 +62,7 @@ class graph_t
         int current_iterations = 0;
         int max_iterations = 5000;
         std::unique_ptr<force_equation> equation;
-
+        
         void create_random_graph(bounding_box bb, blt::size_t min_nodes, blt::size_t max_nodes, blt::f64 connectivity,
                                  blt::f64 scaling_connectivity, blt::f64 distance_factor);
     
@@ -98,6 +100,18 @@ class graph_t
             connected_nodes[n1].insert(n2);
             connected_nodes[n2].insert(n1);
             edges.insert({n1, n2});
+        }
+        
+        void disconnect(const blt::u64 n1, const blt::u64 n2)
+        {
+            connected_nodes[n1].erase(n2);
+            connected_nodes[n2].erase(n1);
+            edges.erase({n1, n2});
+        }
+        
+        bool is_connected(const blt::u64 n1, const blt::u64 n2)
+        {
+            return edges.contains({n1, n2});
         }
         
         void connect(const edge_t& edge)
@@ -188,7 +202,7 @@ class engine_t
         friend struct loader_t;
     private:
         graph_t graph;
-        selector_t selector {graph};
+        selector_t selector{graph};
         
         void draw_gui(const blt::gfx::window_data& data);
     

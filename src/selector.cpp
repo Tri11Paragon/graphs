@@ -115,10 +115,19 @@ void selector_t::process_keyboard(blt::i32 width, blt::i32 height)
     {
         if (blt::gfx::isKeyPressed(GLFW_KEY_C))
         {
-            if (placement)
-                destroy_node(primary_selection);
-            else
-                create_placement_node(mouse_pos);
+            if (primary_selection != -1 && secondary_selection != -1)
+            {
+                if (graph.is_connected(primary_selection, secondary_selection))
+                    graph.disconnect(primary_selection, secondary_selection);
+                else
+                    graph.connect(primary_selection, secondary_selection);
+            } else
+            {
+                if (placement)
+                    destroy_node(primary_selection);
+                else
+                    create_placement_node(mouse_pos);
+            }
         } else if (blt::gfx::isKeyPressed(GLFW_KEY_X))
         {
             if (primary_selection != -1)
