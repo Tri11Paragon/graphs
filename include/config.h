@@ -30,7 +30,7 @@ namespace conf
     inline constexpr float DEFAULT_INITIAL_TEMPERATURE = 100;
     
     inline constexpr float POINT_SIZE = 35;
-    inline constexpr auto DEFAULT_IMAGE = "parker_point";
+    inline constexpr auto DEFAULT_IMAGE = "unknown";
     inline constexpr auto POINT_OUTLINE_COLOR = blt::make_color(0, 0.6, 0.6);
     inline constexpr auto POINT_HIGHLIGHT_COLOR = blt::make_color(0, 1.0, 1.0);
     inline constexpr auto POINT_SELECT_COLOR = blt::make_color(0, 0.9, 0.7);

@@ -24,23 +24,36 @@
 class selector_t
 {
     public:
+        explicit selector_t(graph_t& graph): graph(graph)
+        {}
+        
         // called inside the info panel block, used for adding more information
-        void draw_gui(graph_t& graph, blt::i32 width, blt::i32 height);
+        void draw_gui(blt::i32 width, blt::i32 height);
         
         // called once per frame, for rendering animations
-        void render(graph_t& graph, blt::i32 width, blt::i32 height);
+        void render(blt::i32 width, blt::i32 height);
         
         // called once per frame assuming imgui doesn't want the mouse
-        void process_mouse(graph_t& graph, blt::i32 width, blt::i32 height);
+        void process_mouse(blt::i32 width, blt::i32 height);
+        
+        void process_keyboard(blt::i32 width, blt::i32 height);
+    
     private:
         void set_primary_selection(blt::i64 n);
+        
         void set_drag_selection(blt::i64 n);
+        
         void set_secondary_selection(blt::i64 n);
+        
+        void create_placement_node(const blt::vec2& pos);
+        void destroy_node(blt::i64 node);
+    
     private:
         blt::i64 drag_selection = -1;
         blt::i64 primary_selection = -1;
         blt::i64 secondary_selection = -1;
-        bool edge = false;
+        bool placement = false;
+        graph_t& graph;
 };
 
 #endif //GRAPHS_SELECTION_H

@@ -188,7 +188,7 @@ class engine_t
         friend struct loader_t;
     private:
         graph_t graph;
-        selector_t selector;
+        selector_t selector {graph};
         
         void draw_gui(const blt::gfx::window_data& data);
     
@@ -205,10 +205,12 @@ class engine_t
             auto& io = ImGui::GetIO();
             
             if (!io.WantCaptureMouse)
-                selector.process_mouse(graph, data.width, data.height);
+                selector.process_mouse(data.width, data.height);
+            if (!io.WantCaptureKeyboard)
+                selector.process_keyboard(data.width, data.height);
             
             graph.render();
-            selector.render(graph, data.width, data.height);
+            selector.render(data.width, data.height);
         }
 };
 

@@ -54,6 +54,13 @@ void init(const blt::gfx::window_data& data)
     resources.enqueue("res/parker.png", "parker");
     resources.enqueue("res/parkerpoint.png", "parker_point");
     resources.enqueue("res/parker cat ears.jpg", "parkercat");
+    resources.enqueue("res/ivy.jpg", "ivy");
+    resources.enqueue("res/sayori.jpg", "sayori");
+    resources.enqueue("res/jacob.jpg", "jacob");
+    resources.enqueue("res/braxton.jpg", "braxton");
+    resources.enqueue("res/ben.jpg", "ben");
+    resources.enqueue("res/no_image.jpg", "unknown");
+    resources.enqueue("res/me.png", "me");
     
     if (auto loader = loader_t::load_for(engine, data, "default.json", "save.json"))
     {
@@ -76,7 +83,8 @@ void update(const blt::gfx::window_data& data)
     
     engine.render(data);
     
-    camera.update();
+    if (!im::GetIO().WantCaptureKeyboard)
+        camera.update();
     camera.update_view(global_matrices);
     global_matrices.update();
     

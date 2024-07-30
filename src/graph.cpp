@@ -269,7 +269,7 @@ void engine_t::draw_gui(const blt::gfx::window_data& data)
                 }
             }
         }
-        selector.draw_gui(graph, data.width, data.height);
+        selector.draw_gui(data.width, data.height);
         im::End();
     }
 }
