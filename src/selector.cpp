@@ -89,8 +89,11 @@ void selector_t::process_mouse(blt::i32 width, blt::i32 height)
             {
                 set_drag_selection(static_cast<blt::i64>(index));
                 if (blt::gfx::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+                {
+                    if (secondary_selection != -1)
+                        set_primary_selection(secondary_selection);
                     set_secondary_selection(drag_selection);
-                else
+                } else
                 {
                     set_primary_selection(drag_selection);
                     set_secondary_selection(-1);
@@ -146,9 +149,28 @@ void selector_t::draw_gui(blt::i32 width, blt::i32 height)
         {
             if (secondary_selection >= 0)
             {
+                auto edge_i = graph.edges.find({static_cast<blt::u64>(primary_selection), static_cast<blt::u64>(secondary_selection)});
+                if (edge_i == graph.edges.end())
+                    return;
+                auto edge = *edge_i;
+                bool changed = false;
+                
+                changed |= im::SliderFloat("Ideal Length", &edge.ideal_spring_length, conf::POINT_SIZE, conf::DEFAULT_SPRING_LENGTH * 4);
+                callback_data_t description_data{edge.description, description_input};
+                changed |= im::InputTextMultiline("Description", description_input.data(), description_input.size(), {},
+                                       ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_CallbackEdit | ImGuiInputTextFlags_CallbackCompletion,
+                                       text_input_callback, &description_data);
+                
+                if (changed)
+                {
+                    graph.edges.erase(edge_i);
+                    graph.edges.insert(edge);
+                }
             } else
             {
-                im::InputFloat("Size", &graph.nodes[primary_selection].point.scale);
+                im::SliderFloat("Size", &graph.nodes[primary_selection].point.scale, 1, 100);
+                im::ColorPicker4("Color", graph.nodes[primary_selection].outline_color.data());
+                im::SliderFloat("Scale", &graph.nodes[primary_selection].outline_scale, 1, 2);
                 callback_data_t name_data{graph.nodes[primary_selection].name, name_input};
                 callback_data_t texture_data{graph.nodes[primary_selection].texture, texture_input};
                 callback_data_t description_data{graph.nodes[primary_selection].description, description_input};

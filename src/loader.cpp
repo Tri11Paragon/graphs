@@ -71,11 +71,24 @@ std::optional<loader_t> loader_t::load_for(engine_t& engine, const blt::gfx::win
             auto size = static_cast<blt::f32>(load_with_default(node, "size", static_cast<blt::f64>(conf::POINT_SIZE)));
             auto name = load_with_default<std::string>(node, "name", get_name());
             auto texture = load_with_default<std::string>(node, "texture", conf::DEFAULT_IMAGE);
+            auto outline_scale = load_with_default(node, "scale", conf::OUTLINE_SCALE);
+            auto outline_color = load_with_default(node, "color", json::array());
             
             BLT_ASSERT(!graph.names_to_node.contains(name) && "Graph node name must be unique!");
             graph.names_to_node.insert({name, static_cast<blt::u64>(graph.nodes.size())});
             graph.nodes.emplace_back(blt::gfx::point2d_t{x, y, size}, std::move(name));
             graph.nodes.back().texture = std::move(texture);
+            graph.nodes.back().outline_scale = outline_scale;
+            if (outline_color.is_array() && outline_color.size() >= 3)
+            {
+                auto r = static_cast<float>(outline_color[0].get<double>());
+                auto g = static_cast<float>(outline_color[1].get<double>());
+                auto b = static_cast<float>(outline_color[2].get<double>());
+                if (outline_color > 3)
+                    graph.nodes.back().outline_color = blt::vec4{r, g, b, static_cast<float>(outline_color[3].get<double>())};
+                else
+                    graph.nodes.back().outline_color = blt::make_color(r, g, b);
+            }
         }
     }
     
@@ -158,12 +171,15 @@ void loader_t::save_for(engine_t& engine, const loader_t& loader, std::string_vi
     
     for (const auto& node : graph.nodes)
     {
+        const auto& color = node.outline_color;
         data["nodes"].push_back(json{
                 {"name",    node.name},
                 {"texture", node.texture},
                 {"size",    node.getRenderObj().scale},
                 {"x",       node.getPosition().x()},
                 {"y",       node.getPosition().y()},
+                {"scale",   node.outline_scale},
+                {"color",   json::array({color.x(), color.y(), color.z(), color.w()})}
         });
         data["descriptions"].push_back(json{
                 {"name", node.name},

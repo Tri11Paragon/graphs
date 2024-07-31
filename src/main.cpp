@@ -61,6 +61,7 @@ void init(const blt::gfx::window_data& data)
     resources.enqueue("res/ben.jpg", "ben");
     resources.enqueue("res/no_image.jpg", "unknown");
     resources.enqueue("res/me.png", "me");
+    resources.enqueue("res/jim.jpg", "jim");
     
     if (auto loader = loader_t::load_for(engine, data, "default.json", "save.json"))
     {

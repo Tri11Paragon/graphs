@@ -40,7 +40,7 @@ struct node_t
     
     blt::gfx::point2d_t point;
     blt::vec2 velocity;
-    float outline_scale = 1.25f;
+    float outline_scale = conf::OUTLINE_SCALE;
     blt::color4 outline_color = conf::POINT_OUTLINE_COLOR;
     
     explicit node_t(const blt::gfx::point2d_t& point): name(get_name()), point(point)

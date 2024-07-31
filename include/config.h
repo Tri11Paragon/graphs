@@ -29,7 +29,8 @@ namespace conf
     inline constexpr float DEFAULT_SPRING_LENGTH = 175.0;
     inline constexpr float DEFAULT_INITIAL_TEMPERATURE = 100;
     
-    inline constexpr float POINT_SIZE = 35;
+    inline constexpr float POINT_SIZE = 75;
+    inline constexpr float OUTLINE_SCALE = 1.25f;
     inline constexpr auto DEFAULT_IMAGE = "unknown";
     inline constexpr auto POINT_OUTLINE_COLOR = blt::make_color(0, 0.6, 0.6);
     inline constexpr auto POINT_HIGHLIGHT_COLOR = blt::make_color(0, 1.0, 1.0);
